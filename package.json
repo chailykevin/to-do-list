@@ -4,7 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: notest specified\" && exit 1"
+    "test": "echo \"Error: notest specified\" && exit 1",
+    "watch": "webpack --watch",
+    "build": "webpack"
   },
   "devDependencies": {
     "css-loader": "^7.1.2",
