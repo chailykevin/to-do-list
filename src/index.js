@@ -204,11 +204,6 @@ class Menu {
     this.tasks = [];
   }
 
-  welcome() {
-    alert("Welcome to to do app, choose your project!");
-    this.showProjects();
-  }
-
   showProjects() {
     this.options = "";
     for (var [i, project] of projectManager.getAllProjects().entries()) {
@@ -222,6 +217,8 @@ class Menu {
     this.options += "To quit the app input x";
     this.projectIndex = prompt(this.options);
     this.chooseProject();
+
+    DOM.loadProjects(projectManager.getAllProjects());
   }
 
   chooseProject() {
@@ -242,7 +239,7 @@ class Menu {
     } else if (Number.isInteger(parseInt(this.projectIndex))) {
       this.projectIndex -= 1;
       //Angka 0
-      console.log("test");
+      DOM.newProject();
       projectManager.addProject(prompt("Input your project name")); //Bikin project baru
       this.taskManager = projectManager.openCertainProject(
         projectManager.getAllProjects().length - 1
@@ -396,10 +393,111 @@ class Menu {
   }
 }
 
+class DOMRelated {
+  constructor() {
+    this.body = document.querySelector("body");
+    this.projects = document.getElementById("projects");
+    this.addProjectModal = document.getElementById("addProject-modal");
+    console.log(this.addProjectModal);
+    this.assignButtons();
+  }
+
+  assignButtons() {
+    menuX.projectIndex = 0;
+    const button = document.getElementsByClassName("button");
+    for (var element of button) {
+      if (element.classList.contains("cancel")) {
+        if (element.classList.contains("project")) {
+          console.log("test 1");
+          element.addEventListener("click", () => {
+            this.toggleNewProjectModal(false);
+          });
+        }
+      } else if (element.classList.contains("add")) {
+        if (element.classList.contains("project")) {
+          console.log("test 2");
+          element.addEventListener("click", () => {
+            this.toggleNewProjectModal(true);
+          });
+        }
+      } else if (element.classList.contains("submit")) {
+        if (element.classList.contains("project")) {
+          element.addEventListener("click", () => {
+            this.addNewProject();
+            this.toggleNewProjectModal(false);
+          });
+        }
+      }
+    }
+  }
+
+  toggleNewProjectModal(visibility) {
+    if (visibility) {
+      this.addProjectModal.style.display = "block";
+    } else {
+      this.addProjectModal.style.display = "none";
+    }
+  }
+
+  addNewProject() {
+    const projectName = document.querySelector("input#projectName");
+    projectManager.addProject(projectName.value);
+    this.loadProjects(projectManager.projects);
+  }
+
+  loadProjects(projects) {
+    this.projects.innerHTML = "";
+
+    const title = document.createElement("h2");
+    title.textContent = "Projects";
+    this.projects.appendChild(title);
+
+    if (projects != null) {
+      for (var project of projects) {
+        const container = document.createElement("div");
+        const icon = document.createElement("i");
+        const name = document.createElement("h3");
+
+        container.classList.add("withicon");
+        container.classList.add("open");
+        container.classList.add("button");
+        container.classList.add("project");
+        icon.classList.add("material-icons");
+
+        icon.textContent = "folder";
+        name.textContent = project.name;
+
+        container.appendChild(icon);
+        container.appendChild(name);
+
+        this.projects.appendChild(container);
+      }
+    }
+    const container = document.createElement("div");
+    const icon = document.createElement("i");
+    const name = document.createElement("h3");
+
+    container.classList.add("withicon");
+    container.classList.add("add");
+    container.classList.add("button");
+    container.classList.add("project");
+    icon.classList.add("material-icons");
+
+    icon.textContent = "add";
+    name.textContent = "Add Project";
+
+    container.appendChild(icon);
+    container.appendChild(name);
+
+    this.projects.appendChild(container);
+  }
+}
+
 var projectManager = new ProjectManager();
-projectManager.addProject("Senin");
+// projectManager.addProject("Senin");
 // projectManager.addProject("Selasa");
 // projectManager.addProject("Rabu");
 
 const menuX = new Menu();
+const DOM = new DOMRelated();
 // menuX.welcome();

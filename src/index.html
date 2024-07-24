@@ -20,26 +20,26 @@
       </div>
       <div class="tasks">
         <h2>Tasks</h2>
-        <div class="withicon">
+        <div class="withicon button">
           <i class="material-icons">add</i>
           <h3>Today</h3>
         </div>
-        <div class="withicon">
+        <div class="withicon button">
           <i class="material-icons">add</i>
           <h3>Tomorrow</h3>
         </div>
-        <div class="withicon">
+        <div class="withicon button">
           <i class="material-icons">add</i>
           <h3>This week</h3>
         </div>
-        <div class="withicon">
+        <div class="withicon button">
           <i class="material-icons">add</i>
           <h3>All Tasks</h3>
         </div>
       </div>
-      <div class="projects">
+      <div id="projects">
         <h2>Projects</h2>
-        <div class="withicon">
+        <div class="withicon add button project">
           <i class="material-icons">add</i>
           <h3>Add Project</h3>
         </div>
@@ -48,7 +48,17 @@
     <div class="main">
       <h2>Welcome to ListTrack</h2>
       <h3>To start using ListTrack, add your new project below</h3>
-      <button class="addProject">Add Project</button>
+      <button class="add button project">Add Project</button>
+    </div>
+    <div id="addProject-modal">
+      <div class="wholeModal">
+        <label for="projectName">Insert your project name :</label>
+        <input type="text" id="projectName" />
+        <div class="buttons">
+          <button class="cancel button project">Cancel</button>
+          <button class="submit button project">Add</button>
+        </div>
+      </div>
     </div>
   </body>
 </html>
