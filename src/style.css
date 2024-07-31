@@ -7,6 +7,20 @@
   color: white;
 }
 
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  box-shadow: inset 0 0 5px grey;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgb(90, 90, 90);
+  border-radius: 10px;
+}
+
 body {
   display: flex;
   height: 100vh;
@@ -21,6 +35,8 @@ body .sidebar {
   display: flex;
   flex-direction: column;
   gap: 20px;
+  overflow: hidden;
+  height: 100vh;
 }
 
 body .sidebar .title {
@@ -49,6 +65,23 @@ body .sidebar .withicon:hover {
 
 body .sidebar .withicon h3 {
   font-size: 0.9rem;
+}
+
+body .sidebar .withicon.add.button.project {
+  margin-bottom: 0px;
+}
+
+body .sidebar #projects {
+  flex-grow: 1;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+body .sidebar #projects .scrollable {
+  overflow: auto;
+  padding-right: 10px;
+  scroll-behavior: smooth;
 }
 
 body .main {
@@ -82,7 +115,63 @@ body .main button:hover {
   background-color: rgb(31, 31, 31);
 }
 
-body #addProject-modal {
+body .main.project {
+  display: none;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 80px auto;
+  text-align: center;
+  padding: 20px 60px;
+}
+
+body .main.project h2 {
+  font-size: 1.8rem;
+  justify-self: first baseline;
+  align-self: last baseline;
+}
+
+body .main.project .add.button {
+  justify-self: last baseline;
+  align-self: last baseline;
+  border: 1px solid white;
+  padding: 4px 20px 4px 12px;
+}
+
+body .main.project .add.button:hover {
+  cursor: pointer;
+  background-color: rgb(31, 31, 31);
+}
+
+body .main.project #tasks {
+  border-top: 1px solid white;
+  border-bottom: 1px solid white;
+  height: 100%;
+  .header {
+    border-bottom: 1px solid white;
+  }
+  .task {
+    padding: 4px 0px;
+    display: grid;
+    grid-template-columns: 1fr 4fr 1fr 1fr;
+    p {
+      align-self: center;
+    }
+  }
+  .empty {
+    padding: 4px 0px;
+  }
+}
+
+body .main.project .withicon h3 {
+  font-size: 0.9rem;
+  padding-bottom: 0px;
+}
+
+body .main.project #tasks {
+  grid-column: span 2;
+}
+
+body #addProject-modal,
+#addTask-modal {
   position: fixed;
   width: 100vw;
   height: 100vh;
@@ -91,7 +180,7 @@ body #addProject-modal {
   background-color: rgba(0, 0, 0, 0.548);
 }
 
-body #addProject-modal .wholeModal {
+.wholeModal {
   position: absolute;
   top: 50%;
   left: 50%;
@@ -104,11 +193,13 @@ body #addProject-modal .wholeModal {
   background-color: rgb(43, 43, 43);
 }
 
-body #addProject-modal .wholeModal input {
+body .wholeModal input,
+select,
+option {
   color: black;
 }
 
-body #addProject-modal .wholeModal .buttons {
+body .wholeModal .buttons {
   display: flex;
   flex-direction: row;
   justify-content: space-around;
@@ -117,4 +208,8 @@ body #addProject-modal .wholeModal .buttons {
     width: 80px;
     padding: 3px 0px;
   }
+}
+
+.active {
+  background-color: rgb(75, 75, 75);
 }

@@ -397,9 +397,16 @@ class DOMRelated {
   constructor() {
     this.body = document.querySelector("body");
     this.projects = document.getElementById("projects");
+    this.main = document.querySelector(".main");
     this.addProjectModal = document.getElementById("addProject-modal");
-    console.log(this.addProjectModal);
+    this.addTaskModal = document.getElementById("addTask-modal");
+    this.taskModal = document.querySelector(".main.project");
+    this.taskHeader = document.querySelector(".header");
+    this.tasks = document.getElementById("tasks");
+    this.taskManager;
+    this.i;
     this.assignButtons();
+    this.loadProjects(projectManager.projects);
   }
 
   assignButtons() {
@@ -412,6 +419,11 @@ class DOMRelated {
           element.addEventListener("click", () => {
             this.toggleNewProjectModal(false);
           });
+        } else if (element.classList.contains("task")) {
+          console.log("test 3");
+          element.addEventListener("click", () => {
+            this.toggleNewTaskModal(false);
+          });
         }
       } else if (element.classList.contains("add")) {
         if (element.classList.contains("project")) {
@@ -419,12 +431,22 @@ class DOMRelated {
           element.addEventListener("click", () => {
             this.toggleNewProjectModal(true);
           });
+        } else if (element.classList.contains("task")) {
+          console.log("test 3");
+          element.addEventListener("click", () => {
+            this.toggleNewTaskModal(true);
+          });
         }
       } else if (element.classList.contains("submit")) {
         if (element.classList.contains("project")) {
           element.addEventListener("click", () => {
             this.addNewProject();
             this.toggleNewProjectModal(false);
+          });
+        } else if (element.classList.contains("task")) {
+          element.addEventListener("click", () => {
+            this.addNewTask();
+            this.toggleNewTaskModal(false);
           });
         }
       }
@@ -439,10 +461,37 @@ class DOMRelated {
     }
   }
 
+  toggleNewTaskModal(visibility) {
+    if (visibility) {
+      this.addTaskModal.style.display = "block";
+    } else {
+      this.addTaskModal.style.display = "none";
+    }
+  }
+
   addNewProject() {
     const projectName = document.querySelector("input#projectName");
     projectManager.addProject(projectName.value);
     this.loadProjects(projectManager.projects);
+  }
+
+  addNewTask() {
+    const taskTitle = document.querySelector("input#taskTitle");
+    const description = document.querySelector("input#description");
+    const dueDate = document.querySelector("input#dueDate");
+    const priority = document.querySelector("select#priority");
+
+    this.taskManager.tasks.push(
+      new Task(
+        taskTitle.value,
+        description.value,
+        dueDate.value,
+        priority.value
+      )
+    );
+
+    console.log(this.taskManager);
+    this.loadTask(this.i);
   }
 
   loadProjects(projects) {
@@ -452,30 +501,11 @@ class DOMRelated {
     title.textContent = "Projects";
     this.projects.appendChild(title);
 
-    if (projects != null) {
-      for (var project of projects) {
-        const container = document.createElement("div");
-        const icon = document.createElement("i");
-        const name = document.createElement("h3");
-
-        container.classList.add("withicon");
-        container.classList.add("open");
-        container.classList.add("button");
-        container.classList.add("project");
-        icon.classList.add("material-icons");
-
-        icon.textContent = "folder";
-        name.textContent = project.name;
-
-        container.appendChild(icon);
-        container.appendChild(name);
-
-        this.projects.appendChild(container);
-      }
-    }
     const container = document.createElement("div");
     const icon = document.createElement("i");
     const name = document.createElement("h3");
+    const scrollable = document.createElement("div");
+    scrollable.classList.add("scrollable");
 
     container.classList.add("withicon");
     container.classList.add("add");
@@ -489,14 +519,114 @@ class DOMRelated {
     container.appendChild(icon);
     container.appendChild(name);
 
+    container.addEventListener("click", () => {
+      this.toggleNewProjectModal(true);
+    });
+
     this.projects.appendChild(container);
+
+    if (projects != null) {
+      for (let i = projects.length - 1; i >= 0; i--) {
+        const container = document.createElement("div");
+        const icon = document.createElement("i");
+        const name = document.createElement("h3");
+
+        container.classList.add("withicon");
+        container.classList.add("open");
+        container.classList.add("button");
+        container.classList.add("project");
+        icon.classList.add("material-icons");
+
+        icon.textContent = "folder";
+        name.textContent = projects[i].name;
+
+        container.appendChild(icon);
+        container.appendChild(name);
+
+        container.addEventListener("click", () => {
+          this.i = i;
+          this.removeActive();
+          container.classList.add("active");
+          this.loadTask(this.i);
+          this.openTaskModal(projects[this.i]);
+        });
+
+        scrollable.appendChild(container);
+        this.projects.appendChild(scrollable);
+      }
+    }
+  }
+
+  removeActive() {
+    const container = document.querySelector(".active");
+    if (container != null) {
+      container.classList.remove("active");
+    }
+  }
+
+  loadTask() {
+    this.taskManager = projectManager.openCertainProject(this.i);
+    this.taskHeader;
+    this.tasks.innerHTML = "";
+    this.tasks.appendChild(this.taskHeader);
+
+    if (this.taskManager.tasks == "" || this.taskManager.tasks == null) {
+      const empty = document.createElement("p");
+      empty.textContent = "There's no any tasks available.";
+      empty.classList.add("empty");
+      this.tasks.appendChild(empty);
+
+      console.log("I'm empty");
+    } else {
+      console.log(this.taskManager.tasks);
+      for (var task of this.taskManager.tasks) {
+        const taskContainer = document.createElement("div");
+        taskContainer.classList.add("task");
+        var priority = document.createElement("p");
+        var taskName = document.createElement("p");
+        var dueDate = document.createElement("p");
+        var editDelete = document.createElement("div");
+        var editIcon = document.createElement("i");
+        var deleteIcon = document.createElement("i");
+
+        priority.textContent = task.priority;
+        taskName.textContent = task.title;
+        dueDate.textContent = task.dueDate;
+
+        editIcon.classList.add("material-icons");
+        deleteIcon.classList.add("material-icons");
+
+        editIcon.textContent = "edit";
+        deleteIcon.textContent = "delete";
+
+        editDelete.appendChild(editIcon);
+        editDelete.appendChild(deleteIcon);
+
+        taskContainer.appendChild(priority);
+        taskContainer.appendChild(taskName);
+        taskContainer.appendChild(dueDate);
+        taskContainer.appendChild(editDelete);
+        this.tasks.appendChild(taskContainer);
+      }
+    }
+  }
+
+  openTaskModal(project) {
+    this.main.style.display = "none";
+    this.taskModal.style.display = "grid";
+
+    this.taskModal.childNodes[1].textContent = project.name;
   }
 }
 
 var projectManager = new ProjectManager();
-// projectManager.addProject("Senin");
-// projectManager.addProject("Selasa");
-// projectManager.addProject("Rabu");
+projectManager.addProject("Senin");
+projectManager.addProject("Selasa");
+projectManager.addProject("Rabu");
+projectManager.addProject("Kamis");
+projectManager.addProject("Jumat");
+projectManager.addProject("Sabtu");
+projectManager.addProject("Minggu");
 
 const menuX = new Menu();
 const DOM = new DOMRelated();

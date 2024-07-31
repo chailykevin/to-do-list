@@ -18,7 +18,7 @@
       <div class="title">
         <h1>ListTrack</h1>
       </div>
-      <div class="tasks">
+      <div class="tasksDate">
         <h2>Tasks</h2>
         <div class="withicon button">
           <i class="material-icons">add</i>
@@ -43,12 +43,37 @@
           <i class="material-icons">add</i>
           <h3>Add Project</h3>
         </div>
+        <div class="scrollable"></div>
       </div>
     </div>
     <div class="main">
       <h2>Welcome to ListTrack</h2>
       <h3>To start using ListTrack, add your new project below</h3>
       <button class="add button project">Add Project</button>
+    </div>
+    <div class="main project">
+      <h2>Title</h2>
+      <div class="withicon add button task">
+        <i class="material-icons">add</i>
+        <h3>Add Task</h3>
+      </div>
+      <div id="tasks">
+        <div class="task header">
+          <p>Priority</p>
+          <p>Task Name</p>
+          <p>Due Date</p>
+          <p>Edit Delete</p>
+        </div>
+        <div class="task">
+          <p>Test</p>
+          <p>Test</p>
+          <p>Test</p>
+          <div class="editDelete">
+            <i class="material-icons">edit</i>
+            <i class="material-icons">delete</i>
+          </div>
+        </div>
+      </div>
     </div>
     <div id="addProject-modal">
       <div class="wholeModal">
@@ -57,6 +82,26 @@
         <div class="buttons">
           <button class="cancel button project">Cancel</button>
           <button class="submit button project">Add</button>
+        </div>
+      </div>
+    </div>
+    <div id="addTask-modal">
+      <div class="wholeModal">
+        <label for="taskTitle">Title : </label>
+        <input type="text" id="taskTitle" placeholder="Task's title" />
+        <label for="description">Description : </label>
+        <input type="text" id="description" placeholder="Task's description" />
+        <label for="dueDate">dueDate : </label>
+        <input type="date" id="dueDate" placeholder="Task's due date" />
+        <label for="priority">Priority : </label>
+        <select name="priority" id="priority">
+          <option value="low">Low</option>
+          <option value="medium">Medium</option>
+          <option value="high">High</option>
+        </select>
+        <div class="buttons">
+          <button class="cancel button task">Cancel</button>
+          <button class="submit button task">Add</button>
         </div>
       </div>
     </div>
