@@ -4,6 +4,9 @@ const {
   parse,
   addDays,
   formatDistanceToNowStrict,
+  startOfWeek,
+  endOfWeek,
+  isWithinInterval,
 } = require("date-fns");
 
 class Task {
@@ -134,28 +137,28 @@ class TaskManager {
 
   getWeekTask() {
     var weekTask = [];
+
+    const now = new Date();
+
+    const startOfWeekDate = startOfWeek(now, { weekStartsOn: 0 });
+    const endOfWeekDate = endOfWeek(now, { weekStartsOn: 0 });
+
+    function parseDate(dateString) {
+      return parse(dateString, "dd/MM/yyyy", new Date());
+    }
+
     for (var task of this.tasks) {
+      const taskDate = parse(task.dueDate, "dd/MM/yyyy", new Date());
       if (
-        formatDistanceToNowStrict(new Date("2024", "06", "23"), {
-          unit: "day",
-        }).substring(
-          0,
-          formatDistanceToNowStrict(new Date("2024", "6", "23"), {
-            unit: "day",
-          }).indexOf(" ")
-        ) >= 0 &&
-        formatDistanceToNowStrict(new Date("2024", "6", "23"), {
-          unit: "day",
-        }).substring(
-          0,
-          formatDistanceToNowStrict(new Date("2024", "6", "23"), {
-            unit: "day",
-          }).indexOf(" ")
-        ) < 7
+        isWithinInterval(taskDate, {
+          start: startOfWeekDate,
+          end: endOfWeekDate,
+        })
       ) {
         weekTask.push(task);
       }
     }
+
     return weekTask;
   }
 
@@ -405,6 +408,8 @@ class DOMRelated {
     this.tasks = document.getElementById("tasks");
     this.taskManager;
     this.i;
+    this.currentTaskOpen = "alltask";
+    this.projectSelected = false;
     this.assignButtons();
     this.loadProjects(projectManager.projects);
   }
@@ -412,19 +417,22 @@ class DOMRelated {
   assignButtons() {
     menuX.projectIndex = 0;
     const button = document.getElementsByClassName("button");
-    for (var element of button) {
+    for (let element of button) {
       if (element.classList.contains("cancel")) {
         if (element.classList.contains("project")) {
-          console.log("test 1");
           element.addEventListener("click", () => {
             this.toggleNewProjectModal(false);
           });
         } else if (element.classList.contains("task")) {
-          console.log("test 3");
           element.addEventListener("click", () => {
             this.toggleNewTaskModal(false);
           });
         }
+      } else if (element.classList.contains("taskday")) {
+        element.addEventListener("click", () => {
+          console.log(element);
+          this.dayLoad(element.id);
+        });
       } else if (element.classList.contains("add")) {
         if (element.classList.contains("project")) {
           console.log("test 2");
@@ -481,17 +489,21 @@ class DOMRelated {
     const dueDate = document.querySelector("input#dueDate");
     const priority = document.querySelector("select#priority");
 
+    console.log();
+
     this.taskManager.tasks.push(
       new Task(
         taskTitle.value,
         description.value,
-        dueDate.value,
+        format(dueDate.value, "dd/MM/yyyy"),
         priority.value
       )
     );
 
     console.log(this.taskManager);
-    this.loadTask(this.i);
+    console.log(this.currentTaskOpen);
+    this.loadTask(this.currentTaskOpen);
+    console.log(this.i);
   }
 
   loadProjects(projects) {
@@ -547,8 +559,10 @@ class DOMRelated {
           this.i = i;
           this.removeActive();
           container.classList.add("active");
-          this.loadTask(this.i);
+          this.currentTaskOpen = "alltask";
+          this.loadTask(this.currentTaskOpen);
           this.openTaskModal(projects[this.i]);
+          this.dayLoad(this.currentTaskOpen);
         });
 
         scrollable.appendChild(container);
@@ -557,14 +571,63 @@ class DOMRelated {
     }
   }
 
+  dayLoad(i) {
+    if (this.projectSelected) {
+      const allTask = document.querySelector("div#alltask");
+      const thisWeek = document.querySelector("div#thisweek");
+      const tomorrow = document.querySelector("div#tomorrow");
+      const today = document.querySelector("div#today");
+
+      switch (i) {
+        case "alltask":
+          allTask.classList.add("active");
+          today.classList.remove("active");
+          tomorrow.classList.remove("active");
+          thisWeek.classList.remove("active");
+
+          this.currentTaskOpen = "alltask";
+          this.loadTask(this.currentTaskOpen);
+          break;
+        case "today":
+          today.classList.add("active");
+          tomorrow.classList.remove("active");
+          thisWeek.classList.remove("active");
+          allTask.classList.remove("active");
+
+          this.currentTaskOpen = "today";
+          this.loadTask(this.currentTaskOpen);
+          break;
+        case "tomorrow":
+          tomorrow.classList.add("active");
+          today.classList.remove("active");
+          thisWeek.classList.remove("active");
+          allTask.classList.remove("active");
+
+          this.currentTaskOpen = "tomorrow";
+          this.loadTask(this.currentTaskOpen);
+          break;
+        case "thisweek":
+          thisWeek.classList.add("active");
+          today.classList.remove("active");
+          tomorrow.classList.remove("active");
+          allTask.classList.remove("active");
+
+          this.currentTaskOpen = "thisweek";
+          this.loadTask(this.currentTaskOpen);
+          break;
+      }
+    }
+  }
+
   removeActive() {
-    const container = document.querySelector(".active");
+    const container = document.querySelector(".project.active");
     if (container != null) {
       container.classList.remove("active");
     }
   }
 
-  loadTask() {
+  loadTask(day) {
+    this.projectSelected = true;
     this.taskManager = projectManager.openCertainProject(this.i);
     this.taskHeader;
     this.tasks.innerHTML = "";
@@ -578,8 +641,22 @@ class DOMRelated {
 
       console.log("I'm empty");
     } else {
-      console.log(this.taskManager.tasks);
-      for (var task of this.taskManager.tasks) {
+      let tasks = [];
+      switch (day) {
+        case "alltask":
+          tasks = this.taskManager.getTasks();
+          break;
+        case "today":
+          tasks = this.taskManager.getTodayTask();
+          break;
+        case "tomorrow":
+          tasks = this.taskManager.getTomorrowTask();
+          break;
+        case "thisweek":
+          tasks = this.taskManager.getWeekTask();
+          break;
+      }
+      for (var task of tasks) {
         const taskContainer = document.createElement("div");
         taskContainer.classList.add("task");
         var priority = document.createElement("p");

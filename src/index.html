@@ -20,20 +20,20 @@
       </div>
       <div class="tasksDate">
         <h2>Tasks</h2>
-        <div class="withicon button">
-          <i class="material-icons">add</i>
+        <div class="withicon button taskday" id="today">
+          <i class="material-icons">today</i>
           <h3>Today</h3>
         </div>
-        <div class="withicon button">
-          <i class="material-icons">add</i>
+        <div class="withicon button taskday" id="tomorrow">
+          <i class="material-icons">calendar_today</i>
           <h3>Tomorrow</h3>
         </div>
-        <div class="withicon button">
-          <i class="material-icons">add</i>
+        <div class="withicon button taskday" id="thisweek">
+          <i class="material-icons">calendar_view_week</i>
           <h3>This week</h3>
         </div>
-        <div class="withicon button">
-          <i class="material-icons">add</i>
+        <div class="withicon button taskday" id="alltask">
+          <i class="material-icons">history</i>
           <h3>All Tasks</h3>
         </div>
       </div>
@@ -95,9 +95,9 @@
         <input type="date" id="dueDate" placeholder="Task's due date" />
         <label for="priority">Priority : </label>
         <select name="priority" id="priority">
-          <option value="low">Low</option>
-          <option value="medium">Medium</option>
-          <option value="high">High</option>
+          <option value="Low">Low</option>
+          <option value="Medium">Medium</option>
+          <option value="High">High</option>
         </select>
         <div class="buttons">
           <button class="cancel button task">Cancel</button>
