@@ -200,6 +200,10 @@ class ProjectManager {
   updateProjectName(projectIndex, projectNewName) {
     this.projects[projectIndex].name = projectNewName;
   }
+
+  deleteCertainProject(projectIndex) {
+    this.projects.splice(projectIndex, 1);
+  }
 }
 
 class Menu {
@@ -408,6 +412,9 @@ class DOMRelated {
     this.updateProjectModal = document.getElementById("updateProject-modal");
     this.addProjectModal = document.getElementById("addProject-modal");
     this.addTaskModal = document.getElementById("addTask-modal");
+    this.confirmDeleteModal = document.getElementById(
+      "confirmDeleteProject-modal"
+    );
     this.taskModal = document.querySelector(".main.project");
     this.taskHeader = document.querySelector(".header");
     this.tasks = document.getElementById("tasks");
@@ -430,6 +437,7 @@ class DOMRelated {
             e.preventDefault();
             this.toggleNewProjectModal(false);
             this.toggleUpdateProjectModal(false);
+            this.toggleConfirmDeleteProjectModal(false);
             document.getElementById("formAddProject").reset();
           });
         } else if (element.classList.contains("task")) {
@@ -503,6 +511,14 @@ class DOMRelated {
             //Code to update
           });
         }
+      } else if (element.classList.contains("delete")) {
+        if (element.classList.contains("project")) {
+          element.addEventListener("click", () => {
+            this.deleteProject(this.i);
+            this.loadProjects(projectManager.projects);
+            this.toggleConfirmDeleteProjectModal(false);
+          });
+        }
       }
     }
   }
@@ -513,6 +529,14 @@ class DOMRelated {
       this.updateProjectModal.style.display = "block";
     } else {
       this.updateProjectModal.style.display = "none";
+    }
+  }
+
+  toggleConfirmDeleteProjectModal(visibility) {
+    if (visibility) {
+      this.confirmDeleteModal.style.display = "block";
+    } else {
+      this.confirmDeleteModal.style.display = "none";
     }
   }
 
@@ -540,7 +564,7 @@ class DOMRelated {
 
   addNewTask() {
     const taskTitle = document.querySelector("input#taskTitle");
-    const description = document.querySelector("input#description");
+    const description = document.querySelector("textarea#description");
     const dueDate = document.querySelector("input#dueDate");
     const priority = document.querySelector("select#priority");
 
@@ -602,32 +626,55 @@ class DOMRelated {
 
     container.addEventListener("click", () => {
       this.toggleNewProjectModal(true);
+      this.loadProjects;
     });
 
     this.projects.appendChild(container);
 
     if (projects != null) {
       for (let i = projects.length - 1; i >= 0; i--) {
-        const container = document.createElement("div");
+        const containerMain = document.createElement("div");
+        const containerX = document.createElement("div");
         const icon = document.createElement("i");
         const name = document.createElement("h3");
+        const deleteIcon = document.createElement("i");
 
-        container.classList.add("withicon");
-        container.classList.add("open");
-        container.classList.add("button");
-        container.classList.add("project");
+        containerMain.classList.add("withicon");
+        containerMain.classList.add("open");
+        containerMain.classList.add("button");
+        containerMain.classList.add("project");
         icon.classList.add("material-icons");
+        deleteIcon.classList.add("material-icons");
 
         icon.textContent = "folder";
         name.textContent = projects[i].name;
+        deleteIcon.textContent = "delete";
 
-        container.appendChild(icon);
-        container.appendChild(name);
+        deleteIcon.style.alignSelf = "last baseline";
+        deleteIcon.style.visibility = "hidden";
+        deleteIcon.style.paddingRight = "4px";
 
-        container.addEventListener("click", () => {
+        containerX.style.display = "flex";
+        containerX.style.alignItems = "center";
+        containerX.style.gap = "8px";
+        containerX.style.flex = "auto";
+
+        containerX.appendChild(icon);
+        containerX.appendChild(name);
+
+        containerMain.appendChild(containerX);
+        containerMain.appendChild(deleteIcon);
+
+        deleteIcon.addEventListener("click", () => {
           this.i = i;
+          this.toggleConfirmDeleteProjectModal(true);
+        });
+
+        containerX.addEventListener("click", () => {
+          this.i = i;
+          console.log(this.i);
           this.removeActive();
-          container.classList.add("active");
+          containerMain.classList.add("active");
           this.currentTaskOpen = "alltask";
           this.loadTask(this.currentTaskOpen);
           console.log(projects);
@@ -635,7 +682,7 @@ class DOMRelated {
           this.dayLoad(this.currentTaskOpen);
         });
 
-        scrollable.appendChild(container);
+        scrollable.appendChild(containerMain);
         this.projects.appendChild(scrollable);
       }
     }
@@ -689,6 +736,10 @@ class DOMRelated {
     }
   }
 
+  deleteProject(i) {
+    projectManager.deleteCertainProject(i);
+  }
+
   removeActive() {
     const container = document.querySelector(".project.active");
     if (container != null) {
@@ -701,7 +752,6 @@ class DOMRelated {
     this.taskManager = projectManager.openCertainProject(this.i);
     this.taskHeader;
     this.tasks.innerHTML = "";
-    this.tasks.appendChild(this.taskHeader);
 
     if (this.taskManager.tasks == "" || this.taskManager.tasks == null) {
       const empty = document.createElement("p");
@@ -729,23 +779,20 @@ class DOMRelated {
       switch (day) {
         case "alltask":
           tasks = this.taskManager.getTasks();
-          this.day.textContent = "All Tasks";
+          this.day.textContent = "- All Tasks";
           break;
         case "today":
           tasks = this.taskManager.getTodayTask();
-          this.day.textContent = "Today's Tasks";
+          this.day.textContent = "- Today's Tasks";
           break;
         case "tomorrow":
-          this.day.textContent = "Tomorrow's Tasks";
-          console.log("a");
-          console.log(this.day);
-          console.log("p");
+          this.day.textContent = "- Tomorrow's Tasks";
           tasks = this.taskManager.getTomorrowTask();
 
           break;
         case "thisweek":
           tasks = this.taskManager.getWeekTask();
-          this.day.textContent = "This Week's Tasks";
+          this.day.textContent = "- This Week's Tasks";
           break;
       }
       for (var task of tasks) {
@@ -762,7 +809,12 @@ class DOMRelated {
         taskName.textContent = task.title;
         dueDate.textContent = task.dueDate;
 
+        priority.classList.add("priority");
+        taskName.classList.add("taskName");
+        dueDate.classList.add("taskDueDate");
+
         editIcon.classList.add("material-icons");
+        editIcon.style.paddingRight = "12px";
         deleteIcon.classList.add("material-icons");
 
         editIcon.textContent = "edit";
