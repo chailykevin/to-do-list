@@ -196,6 +196,10 @@ class ProjectManager {
       return null;
     }
   }
+
+  updateProjectName(projectIndex, projectNewName) {
+    this.projects[projectIndex].name = projectNewName;
+  }
 }
 
 class Menu {
@@ -401,6 +405,7 @@ class DOMRelated {
     this.body = document.querySelector("body");
     this.projects = document.getElementById("projects");
     this.main = document.querySelector(".main");
+    this.updateProjectModal = document.getElementById("updateProject-modal");
     this.addProjectModal = document.getElementById("addProject-modal");
     this.addTaskModal = document.getElementById("addTask-modal");
     this.taskModal = document.querySelector(".main.project");
@@ -410,6 +415,7 @@ class DOMRelated {
     this.i;
     this.currentTaskOpen = "alltask";
     this.projectSelected = false;
+    this.day = document.getElementById("day");
     this.assignButtons();
     this.loadProjects(projectManager.projects);
   }
@@ -420,12 +426,17 @@ class DOMRelated {
     for (let element of button) {
       if (element.classList.contains("cancel")) {
         if (element.classList.contains("project")) {
-          element.addEventListener("click", () => {
+          element.addEventListener("click", (e) => {
+            e.preventDefault();
             this.toggleNewProjectModal(false);
+            this.toggleUpdateProjectModal(false);
+            document.getElementById("formAddProject").reset();
           });
         } else if (element.classList.contains("task")) {
-          element.addEventListener("click", () => {
+          element.addEventListener("click", (e) => {
+            e.preventDefault();
             this.toggleNewTaskModal(false);
+            document.getElementById("formAddTask").reset();
           });
         }
       } else if (element.classList.contains("taskday")) {
@@ -447,17 +458,61 @@ class DOMRelated {
         }
       } else if (element.classList.contains("submit")) {
         if (element.classList.contains("project")) {
-          element.addEventListener("click", () => {
-            this.addNewProject();
-            this.toggleNewProjectModal(false);
+          element.addEventListener("click", (e) => {
+            const projectName = document.getElementById("projectNameA");
+            if (projectName.value != "") {
+              e.preventDefault();
+              this.addNewProject();
+              this.toggleNewProjectModal(false);
+              document.getElementById("formAddProject").reset();
+            }
           });
         } else if (element.classList.contains("task")) {
-          element.addEventListener("click", () => {
-            this.addNewTask();
-            this.toggleNewTaskModal(false);
+          element.addEventListener("click", (e) => {
+            const taskTitle = document.getElementById("taskTitle");
+            const description = document.getElementById("description");
+            const dueDate = document.getElementById("dueDate");
+            const priority = document.getElementById("priority");
+            if (
+              taskTitle.value != "" &&
+              description.value != "" &&
+              dueDate.value != "" &&
+              priority.value != ""
+            ) {
+              e.preventDefault();
+              this.addNewTask();
+              this.toggleNewTaskModal(false);
+              document.getElementById("formAddTask").reset();
+            }
+          });
+        }
+      } else if (element.classList.contains("update")) {
+        element.addEventListener("click", () => {
+          this.toggleUpdateProjectModal(true);
+        });
+      } else if (element.classList.contains("confirm")) {
+        if (element.classList.contains("project")) {
+          element.addEventListener("click", (e) => {
+            const projectName = document.getElementById("projectNameU");
+            if (projectName.value != "") {
+              e.preventDefault();
+              this.updateProjectName();
+              this.toggleUpdateProjectModal(false);
+              document.getElementById("formAddProject").reset();
+            }
+            //Code to update
           });
         }
       }
+    }
+  }
+
+  toggleUpdateProjectModal(visibility) {
+    if (visibility) {
+      this.loadProjectName();
+      this.updateProjectModal.style.display = "block";
+    } else {
+      this.updateProjectModal.style.display = "none";
     }
   }
 
@@ -478,7 +533,7 @@ class DOMRelated {
   }
 
   addNewProject() {
-    const projectName = document.querySelector("input#projectName");
+    const projectName = document.querySelector("input#projectNameA");
     projectManager.addProject(projectName.value);
     this.loadProjects(projectManager.projects);
   }
@@ -504,6 +559,20 @@ class DOMRelated {
     console.log(this.currentTaskOpen);
     this.loadTask(this.currentTaskOpen);
     console.log(this.i);
+  }
+
+  loadProjectName() {
+    const projectNameInput = document.querySelector("input#projectNameU");
+    projectNameInput.value = document.querySelector(
+      "h2.update.button.project"
+    ).textContent;
+  }
+
+  updateProjectName() {
+    const projectName = document.querySelector("input#projectNameU");
+    projectManager.updateProjectName(this.i, projectName.value);
+    this.loadProjects(projectManager.projects);
+    this.openTaskModal(projectManager.projects[this.i]);
   }
 
   loadProjects(projects) {
@@ -561,6 +630,7 @@ class DOMRelated {
           container.classList.add("active");
           this.currentTaskOpen = "alltask";
           this.loadTask(this.currentTaskOpen);
+          console.log(projects);
           this.openTaskModal(projects[this.i]);
           this.dayLoad(this.currentTaskOpen);
         });
@@ -640,20 +710,42 @@ class DOMRelated {
       this.tasks.appendChild(empty);
 
       console.log("I'm empty");
+      switch (day) {
+        case "alltask":
+          this.day.textContent = "- All Tasks";
+          break;
+        case "today":
+          this.day.textContent = "- Today's Tasks";
+          break;
+        case "tomorrow":
+          this.day.textContent = "- Tomorrow's Tasks";
+          break;
+        case "thisweek":
+          this.day.textContent = "- This Week's Tasks";
+          break;
+      }
     } else {
       let tasks = [];
       switch (day) {
         case "alltask":
           tasks = this.taskManager.getTasks();
+          this.day.textContent = "All Tasks";
           break;
         case "today":
           tasks = this.taskManager.getTodayTask();
+          this.day.textContent = "Today's Tasks";
           break;
         case "tomorrow":
+          this.day.textContent = "Tomorrow's Tasks";
+          console.log("a");
+          console.log(this.day);
+          console.log("p");
           tasks = this.taskManager.getTomorrowTask();
+
           break;
         case "thisweek":
           tasks = this.taskManager.getWeekTask();
+          this.day.textContent = "This Week's Tasks";
           break;
       }
       for (var task of tasks) {

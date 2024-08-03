@@ -52,7 +52,8 @@
       <button class="add button project">Add Project</button>
     </div>
     <div class="main project">
-      <h2>Title</h2>
+      <h2 class="update button project">Title -</h2>
+      <p id="day"></p>
       <div class="withicon add button task">
         <i class="material-icons">add</i>
         <h3>Add Task</h3>
@@ -76,23 +77,43 @@
       </div>
     </div>
     <div id="addProject-modal">
-      <div class="wholeModal">
-        <label for="projectName">Insert your project name :</label>
-        <input type="text" id="projectName" />
+      <form class="wholeModal" id="formAddProject">
+        <label for="projectNameA">Insert your project name :</label>
+        <input type="text" id="projectNameA" name="projectName" required />
         <div class="buttons">
-          <button class="cancel button project">Cancel</button>
+          <button class="cancel button project" type="button">Cancel</button>
           <button class="submit button project">Add</button>
         </div>
-      </div>
+      </form>
+    </div>
+    <div id="updateProject-modal">
+      <form class="wholeModal" id="formUpdateProject">
+        <label for="projectNameU">Insert your new project name :</label>
+        <input type="text" id="projectNameU" name="projectName" required />
+        <div class="buttons">
+          <button class="cancel button project" type="button">Cancel</button>
+          <button class="confirm button project">Confirm</button>
+        </div>
+      </form>
     </div>
     <div id="addTask-modal">
-      <div class="wholeModal">
+      <form class="wholeModal" id="formAddTask">
         <label for="taskTitle">Title : </label>
-        <input type="text" id="taskTitle" placeholder="Task's title" />
+        <input type="text" id="taskTitle" placeholder="Task's title" required />
         <label for="description">Description : </label>
-        <input type="text" id="description" placeholder="Task's description" />
+        <input
+          type="text"
+          id="description"
+          placeholder="Task's description"
+          required
+        />
         <label for="dueDate">dueDate : </label>
-        <input type="date" id="dueDate" placeholder="Task's due date" />
+        <input
+          type="date"
+          id="dueDate"
+          placeholder="Task's due date"
+          required
+        />
         <label for="priority">Priority : </label>
         <select name="priority" id="priority">
           <option value="Low">Low</option>
@@ -103,7 +124,7 @@
           <button class="cancel button task">Cancel</button>
           <button class="submit button task">Add</button>
         </div>
-      </div>
+      </form>
     </div>
   </body>
 </html>

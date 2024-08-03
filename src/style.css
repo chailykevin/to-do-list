@@ -71,6 +71,10 @@ body .sidebar .withicon.add.button.project {
   margin-bottom: 0px;
 }
 
+body .sidebar .withicon.open.button.project {
+  text-overflow: ellipsis;
+}
+
 body .sidebar #projects {
   flex-grow: 1;
   overflow: hidden;
@@ -79,11 +83,16 @@ body .sidebar #projects {
 }
 
 body .sidebar #projects .scrollable {
-  overflow: auto;
+  overflow-y: auto;
+  overflow-x: hidden;
   padding-right: 10px;
   scroll-behavior: smooth;
 }
 
+body .sidebar #projects .scrollable h3 {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
 body .main {
   flex: 1;
   background-color: rgb(62, 62, 62);
@@ -117,21 +126,41 @@ body .main button:hover {
 
 body .main.project {
   display: none;
-  grid-template-columns: 1fr 1fr;
-  grid-template-rows: 80px auto;
+  grid-template-columns: auto 1fr 1fr;
+  grid-template-rows: 60px auto;
   text-align: center;
-  padding: 0px 60px 20px 60px;
+  padding: 20px 60px 30px 60px;
 }
 
 body .main.project h2 {
   font-size: 1.8rem;
+  padding-bottom: 0px;
   justify-self: first baseline;
-  align-self: last baseline;
+  align-self: center;
+  max-width: 500px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-decoration: underline;
+}
+
+body .main.project h2:hover {
+  cursor: pointer;
+}
+
+body .main.project p {
+  justify-self: first baseline;
+  align-self: center;
+  padding-left: 8px;
+  font-size: 1.2rem;
+}
+
+body .main.project #tasks p {
+  font-size: 1rem;
 }
 
 body .main.project .add.button {
   justify-self: last baseline;
-  align-self: last baseline;
+  align-self: center;
   border: 1px solid white;
   padding: 4px 20px 4px 12px;
 }
@@ -167,11 +196,12 @@ body .main.project .withicon h3 {
 }
 
 body .main.project #tasks {
-  grid-column: span 2;
+  grid-column: span 3;
 }
 
 body #addProject-modal,
-#addTask-modal {
+#addTask-modal,
+#updateProject-modal {
   position: fixed;
   width: 100vw;
   height: 100vh;
@@ -180,7 +210,7 @@ body #addProject-modal,
   background-color: rgba(0, 0, 0, 0.548);
 }
 
-.wholeModal {
+form.wholeModal {
   position: absolute;
   top: 50%;
   left: 50%;
