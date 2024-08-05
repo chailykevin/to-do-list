@@ -412,14 +412,18 @@ class DOMRelated {
     this.updateProjectModal = document.getElementById("updateProject-modal");
     this.addProjectModal = document.getElementById("addProject-modal");
     this.addTaskModal = document.getElementById("addTask-modal");
-    this.confirmDeleteModal = document.getElementById(
+    this.confirmDeleteProjectModal = document.getElementById(
       "confirmDeleteProject-modal"
+    );
+    this.confirmDeleteTaskModal = document.getElementById(
+      "confirmDeleteTask-modal"
     );
     this.taskModal = document.querySelector(".main.project");
     this.taskHeader = document.querySelector(".header");
     this.tasks = document.getElementById("tasks");
     this.taskManager;
     this.i;
+    this.j;
     this.currentTaskOpen = "alltask";
     this.projectSelected = false;
     this.day = document.getElementById("day");
@@ -438,6 +442,7 @@ class DOMRelated {
             this.toggleNewProjectModal(false);
             this.toggleUpdateProjectModal(false);
             this.toggleConfirmDeleteProjectModal(false);
+            this.toggleConfirmDeleteTaskModal(false);
             document.getElementById("formAddProject").reset();
           });
         } else if (element.classList.contains("task")) {
@@ -518,6 +523,12 @@ class DOMRelated {
             this.loadProjects(projectManager.projects);
             this.toggleConfirmDeleteProjectModal(false);
           });
+        } else if (element.classList.contains("task")) {
+          element.addEventListener("click", () => {
+            this.deleteTask(this.j);
+            this.loadTask(this.currentTaskOpen);
+            this.toggleConfirmDeleteTaskModal(false);
+          });
         }
       }
     }
@@ -534,9 +545,17 @@ class DOMRelated {
 
   toggleConfirmDeleteProjectModal(visibility) {
     if (visibility) {
-      this.confirmDeleteModal.style.display = "block";
+      this.confirmDeleteProjectModal.style.display = "block";
     } else {
-      this.confirmDeleteModal.style.display = "none";
+      this.confirmDeleteProjectModal.style.display = "none";
+    }
+  }
+
+  toggleConfirmDeleteTaskModal(visibility) {
+    if (visibility) {
+      this.confirmDeleteTaskModal.style.display = "block";
+    } else {
+      this.confirmDeleteTaskModal.style.display = "none";
     }
   }
 
@@ -740,6 +759,10 @@ class DOMRelated {
     projectManager.deleteCertainProject(i);
   }
 
+  deleteTask(j) {
+    this.taskManager.deleteCertainTask(j);
+  }
+
   removeActive() {
     const container = document.querySelector(".project.active");
     if (container != null) {
@@ -795,7 +818,7 @@ class DOMRelated {
           this.day.textContent = "- This Week's Tasks";
           break;
       }
-      for (var task of tasks) {
+      for (let j = 0; j < tasks.length; j++) {
         const taskContainer = document.createElement("div");
         taskContainer.classList.add("task");
         var priority = document.createElement("p");
@@ -805,20 +828,26 @@ class DOMRelated {
         var editIcon = document.createElement("i");
         var deleteIcon = document.createElement("i");
 
-        priority.textContent = task.priority;
-        taskName.textContent = task.title;
-        dueDate.textContent = task.dueDate;
+        priority.textContent = tasks[j].priority;
+        taskName.textContent = tasks[j].title;
+        dueDate.textContent = tasks[j].dueDate;
 
         priority.classList.add("priority");
         taskName.classList.add("taskName");
         dueDate.classList.add("taskDueDate");
 
         editIcon.classList.add("material-icons");
-        editIcon.style.paddingRight = "12px";
+        editIcon.style.marginRight = "12px";
         deleteIcon.classList.add("material-icons");
 
         editIcon.textContent = "edit";
         deleteIcon.textContent = "delete";
+
+        deleteIcon.addEventListener("click", () => {
+          this.j = j;
+          console.log("test");
+          this.toggleConfirmDeleteTaskModal(true);
+        });
 
         editDelete.appendChild(editIcon);
         editDelete.appendChild(deleteIcon);

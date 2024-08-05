@@ -126,7 +126,12 @@ body .main button {
   border-radius: 10px;
 }
 
-body .main button:hover {
+body .main.project #tasks div i {
+  padding: 2px;
+}
+
+body .main button:hover,
+body .main.project #tasks div i:hover {
   cursor: pointer;
   background-color: rgb(31, 31, 31);
 }
@@ -184,8 +189,8 @@ body .main.project #tasks {
   .task {
     padding: 4px 0px;
     display: grid;
-    grid-template-columns: 1fr 4fr 1fr 62px;
-    gap: 12px;
+    grid-template-columns: 1fr 4fr 1fr auto;
+    gap: 8px;
     .priority {
       justify-self: center;
     }
@@ -213,7 +218,8 @@ body .main.project #tasks {
 body #addProject-modal,
 #addTask-modal,
 #updateProject-modal,
-#confirmDeleteProject-modal {
+#confirmDeleteProject-modal,
+#confirmDeleteTask-modal {
   position: fixed;
   width: 100vw;
   height: 100vh;
