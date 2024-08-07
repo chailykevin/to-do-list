@@ -139,5 +139,41 @@
         </div>
       </form>
     </div>
+    <div id="updateTask-modal">
+      <form class="wholeModal" id="formUpdateTask">
+        <label for="taskTitleU">Title : </label>
+        <input
+          type="text"
+          id="taskTitleU"
+          placeholder="Task's title"
+          required
+        />
+        <label for="descriptionU">Description : </label>
+        <textarea
+          name="description"
+          id="descriptionU"
+          placeholder="Task's description"
+          rows="5"
+          required
+        ></textarea>
+        <label for="dueDateU">dueDate : </label>
+        <input
+          type="date"
+          id="dueDateU"
+          placeholder="Task's due date"
+          required
+        />
+        <label for="priorityU">Priority : </label>
+        <select name="priority" id="priorityU">
+          <option value="Low">Low</option>
+          <option value="Medium">Medium</option>
+          <option value="High">High</option>
+        </select>
+        <div class="buttons">
+          <button class="cancel button task">Cancel</button>
+          <button class="confirm button task">Confirm</button>
+        </div>
+      </form>
+    </div>
   </body>
 </html>

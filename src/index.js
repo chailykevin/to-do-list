@@ -75,44 +75,17 @@ class TaskManager {
     return this.tasks;
   }
 
-  editCertainTask(task, taskManager, numberOfDay, taskIndex) {
-    // taskManager.getTasks();
-    // var task = "";
-    task = taskManager.openCertainTask(task);
-    task += "Input which info to edit";
-    var name = prompt(task);
-    if (
-      name == "title" ||
-      name == "priority" ||
-      name == "due date" ||
-      name == "description"
-    ) {
-      if (name == "title") {
-        this.tasks[taskIndex].title = prompt(
-          `${name} : ${this.tasks[taskIndex].title}\nInput the new value`
-        );
-      } else if (name == "due date") {
-        this.tasks[taskIndex].dueDate = prompt(
-          `${name} : ${this.tasks[taskIndex].dueDate}\nInput the new value`
-        );
-      } else if (name == "description") {
-        this.tasks[taskIndex].description = prompt(
-          `${name} : ${this.tasks[taskIndex].description}\nInput the new value`
-        );
-      } else if (name == "priority") {
-        this.tasks[taskIndex].priority = prompt(
-          `${name} : ${this.tasks[taskIndex].priority}\nInput the new value`
-        );
-      }
-      menuX.chooseTask(numberOfDay, false, true);
-    } else {
-      alert("The info isn't valid");
-      this.editCertainTask(
-        this.tasks[this.taskIndex],
-        this.taskManager,
-        numberOfDay
-      ); // Fix
-    }
+  editCertainTask(
+    taskIndex,
+    taskTitle,
+    taskDescription,
+    taskDueDate,
+    taskPriority
+  ) {
+    this.tasks[taskIndex].title = taskTitle;
+    this.tasks[taskIndex].description = taskDescription;
+    this.tasks[taskIndex].dueDate = taskDueDate;
+    this.tasks[taskIndex].priority = taskPriority;
   }
 
   getTodayTask() {
@@ -410,6 +383,7 @@ class DOMRelated {
     this.projects = document.getElementById("projects");
     this.main = document.querySelector(".main");
     this.updateProjectModal = document.getElementById("updateProject-modal");
+    this.updateTaskModal = document.getElementById("updateTask-modal");
     this.addProjectModal = document.getElementById("addProject-modal");
     this.addTaskModal = document.getElementById("addTask-modal");
     this.confirmDeleteProjectModal = document.getElementById(
@@ -442,13 +416,14 @@ class DOMRelated {
             this.toggleNewProjectModal(false);
             this.toggleUpdateProjectModal(false);
             this.toggleConfirmDeleteProjectModal(false);
-            this.toggleConfirmDeleteTaskModal(false);
             document.getElementById("formAddProject").reset();
           });
         } else if (element.classList.contains("task")) {
           element.addEventListener("click", (e) => {
             e.preventDefault();
             this.toggleNewTaskModal(false);
+            this.toggleConfirmDeleteTaskModal(false);
+            this.toggleUpdateTaskModal(false);
             document.getElementById("formAddTask").reset();
           });
         }
@@ -500,9 +475,11 @@ class DOMRelated {
           });
         }
       } else if (element.classList.contains("update")) {
-        element.addEventListener("click", () => {
-          this.toggleUpdateProjectModal(true);
-        });
+        if (element.classList.contains("project")) {
+          element.addEventListener("click", () => {
+            this.toggleUpdateProjectModal(true);
+          });
+        }
       } else if (element.classList.contains("confirm")) {
         if (element.classList.contains("project")) {
           element.addEventListener("click", (e) => {
@@ -511,9 +488,31 @@ class DOMRelated {
               e.preventDefault();
               this.updateProjectName();
               this.toggleUpdateProjectModal(false);
-              document.getElementById("formAddProject").reset();
             }
             //Code to update
+          });
+        } else if (element.classList.contains("task")) {
+          element.addEventListener("click", (e) => {
+            const taskTitle = document.getElementById("taskTitleU");
+            const description = document.getElementById("descriptionU");
+            const dueDate = document.getElementById("dueDateU");
+            const priority = document.getElementById("priorityU");
+
+            if (
+              taskTitle.value != "" &&
+              description.value != "" &&
+              dueDate.value != "" &&
+              priority.value != ""
+            ) {
+              e.preventDefault();
+              this.updateTask(
+                taskTitle.value,
+                description.value,
+                dueDate.value,
+                priority.value
+              );
+              this.toggleUpdateTaskModal(false);
+            }
           });
         }
       } else if (element.classList.contains("delete")) {
@@ -540,6 +539,15 @@ class DOMRelated {
       this.updateProjectModal.style.display = "block";
     } else {
       this.updateProjectModal.style.display = "none";
+    }
+  }
+
+  toggleUpdateTaskModal(visibility) {
+    if (visibility) {
+      this.loadTaskInfo();
+      this.updateTaskModal.style.display = "block";
+    } else {
+      this.updateTaskModal.style.display = "none";
     }
   }
 
@@ -587,13 +595,13 @@ class DOMRelated {
     const dueDate = document.querySelector("input#dueDate");
     const priority = document.querySelector("select#priority");
 
-    console.log();
+    console.log(dueDate.value);
 
     this.taskManager.tasks.push(
       new Task(
         taskTitle.value,
         description.value,
-        format(dueDate.value, "dd/MM/yyyy"),
+        dueDate.value,
         priority.value
       )
     );
@@ -611,10 +619,35 @@ class DOMRelated {
     ).textContent;
   }
 
+  loadTaskInfo() {
+    const taskTitle = document.getElementById("taskTitleU");
+    const description = document.getElementById("descriptionU");
+    const dueDate = document.getElementById("dueDateU");
+    const priority = document.getElementById("priorityU");
+
+    console.log(format(this.taskManager.tasks[this.j].dueDate, "yyyy-MM-dd"));
+    taskTitle.value = this.taskManager.tasks[this.j].title;
+    description.value = this.taskManager.tasks[this.j].description;
+    dueDate.value = this.taskManager.tasks[this.j].dueDate; //Figure biar String bs masuk ke date gmn
+    priority.value = this.taskManager.tasks[this.j].priority;
+  }
+
   updateProjectName() {
     const projectName = document.querySelector("input#projectNameU");
     projectManager.updateProjectName(this.i, projectName.value);
     this.loadProjects(projectManager.projects);
+    this.openTaskModal(projectManager.projects[this.i]);
+  }
+
+  updateTask(taskTitle, taskDescription, taskDueDate, taskPriority) {
+    this.taskManager.editCertainTask(
+      this.j,
+      taskTitle,
+      taskDescription,
+      taskDueDate,
+      taskPriority
+    );
+    this.loadTask(this.currentTaskOpen);
     this.openTaskModal(projectManager.projects[this.i]);
   }
 
@@ -691,7 +724,6 @@ class DOMRelated {
 
         containerX.addEventListener("click", () => {
           this.i = i;
-          console.log(this.i);
           this.removeActive();
           containerMain.classList.add("active");
           this.currentTaskOpen = "alltask";
@@ -830,7 +862,7 @@ class DOMRelated {
 
         priority.textContent = tasks[j].priority;
         taskName.textContent = tasks[j].title;
-        dueDate.textContent = tasks[j].dueDate;
+        dueDate.textContent = format(tasks[j].dueDate, "dd-MM-yyyy");
 
         priority.classList.add("priority");
         taskName.classList.add("taskName");
@@ -843,9 +875,12 @@ class DOMRelated {
         editIcon.textContent = "edit";
         deleteIcon.textContent = "delete";
 
-        deleteIcon.addEventListener("click", () => {
+        editIcon.addEventListener("click", () => {
           this.j = j;
-          console.log("test");
+          this.toggleUpdateTaskModal(true);
+        });
+
+        deleteIcon.addEventListener("click", () => {
           this.toggleConfirmDeleteTaskModal(true);
         });
 

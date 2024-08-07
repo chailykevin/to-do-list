@@ -218,6 +218,7 @@ body .main.project #tasks {
 body #addProject-modal,
 #addTask-modal,
 #updateProject-modal,
+#updateTask-modal,
 #confirmDeleteProject-modal,
 #confirmDeleteTask-modal {
   position: fixed;
