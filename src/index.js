@@ -403,6 +403,14 @@ class DOMRelated {
     this.day = document.getElementById("day");
     this.assignButtons();
     this.loadProjects(projectManager.projects);
+    this.setDateInput();
+  }
+
+  setDateInput() {
+    var today = new Date().toISOString().split("T")[0];
+    var dates = document.querySelectorAll("input.date").forEach((date) => {
+      date.setAttribute("min", today);
+    });
   }
 
   assignButtons() {
