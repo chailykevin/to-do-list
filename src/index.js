@@ -3,29 +3,106 @@ const {
   format,
   parse,
   addDays,
-  formatDistanceToNowStrict,
   startOfWeek,
   endOfWeek,
   isWithinInterval,
 } = require("date-fns");
 
+class Storage {
+  checkStorage() {
+    if (localStorage.length == 0) {
+      console.log(localStorage.getItem("P0"));
+      console.log("nun");
+    } else {
+      this.getProjects();
+    }
+  }
+
+  // loadProjects()
+
+  saveProjects() {
+    // localStorage.clear();
+    // for (let project of projectManager.projects) {
+    //   localStorage.setItem(`P${project.uid}`, JSON.stringify(project.name));
+    //   for (var task of project.taskManager.tasks) {
+    //     localStorage.setItem(
+    //       `P${project.uid}.T${task.uid}`,
+    //       JSON.stringify(task)
+    //     );
+    //   }
+    // }
+    // localStorage.setItem("tasks", projectManager.projects);
+    localStorage.setItem("projectManager", JSON.stringify(projectManager));
+    // for (let project of projectManager.projects) {
+    //   // console.log(project.name);
+    //   localStorage.setItem(
+    //     `${project.name}.task`,
+    //     JSON.stringify(project.taskManager.tasks)
+    //   );
+    // }
+  }
+
+  getProjects() {
+    let projectManagers = JSON.parse(localStorage.getItem("projectManager"));
+    for (let i = 0; i < projectManagers.projects.length; i++) {
+      projectManager.addProject(projectManagers.projects[i].name);
+      let currentProject = projectManager.projects[i];
+      let taskList = projectManagers.projects[i].taskManager.tasks;
+      console.log(taskList);
+
+      for (let task of taskList) {
+        console.log(task.isComplete);
+        if (task.projectName == currentProject.name) {
+          currentProject.taskManager.addTask(
+            task.title,
+            task.description,
+            task.dueDate,
+            task.priority,
+            task.isComplete
+          );
+        }
+      }
+
+      DOM.loadProjects(projectManager.projects);
+    }
+    //   let projects;
+    //   let tasks = [];
+    //   for (let i = 0; i < localStorage.length; i++) {
+    //     // var value = localStorage.getItem(localStorage.key(i));
+    //     // console.log(localStorage.key(i));
+    //     if (!localStorage.key(i).includes(".")) {
+    //       projects = JSON.parse(localStorage.getItem(localStorage.key(i)));
+    //     } else {
+    //       tasks.push(JSON.parse(localStorage.getItem(localStorage.key(i))));
+    //     }
+    //     // } else {
+    //     //   // console.log(JSON.parse(localStorage.getItem(localStorage.key(i))));
+    //     //   // projectManager.addProject(
+    //     //   //   JSON.parse(localStorage.getItem(localStorage.key(i)))
+    //     //   // );
+    //     // }
+    //   }
+    //   for (let task of tasks) {
+    //     console.log(task.projectName);
+    //   }
+    //   for (let project of projects) {
+    //     projectManager.addProject(project.name);
+    //   }
+    //   console.log(tasks);
+    //   // console.log(projectManager);
+  }
+}
+
+const Store = new Storage();
+
 class Task {
-  constructor(title, description, dueDate, priority) {
+  constructor(title, description, dueDate, priority, projectName, isComplete) {
     this.title = title;
     this.description = description;
     this.dueDate = dueDate;
     this.priority = priority;
-    this.isComplete = false;
-  }
-
-  showDetail() {
-    var details = "";
-    details += `Title : ${this.title}\n`;
-    details += `Description : ${this.description}\n`;
-    details += `Due date : ${this.dueDate}\n`;
-    details += `Priority : ${this.priority}\n`;
-    details += `Is complete : ${this.isComplete}\n`;
-    return details;
+    this.isComplete = isComplete;
+    this.projectName = projectName;
   }
 }
 
@@ -33,45 +110,29 @@ class TaskManager {
   constructor(projectName) {
     this.projectName = projectName;
     this.tasks = [];
-    const menuX = new Menu();
   }
 
-  addTask() {
-    var dueDate;
-    const title = prompt("Input the task's title : ");
-    const description = prompt("Input the task's description : ");
-    do {
-      try {
-        const dueDatePre = prompt("Input the task's due date (DD/MM/YYYY) : ");
-        dueDate = format(
-          parse(dueDatePre, "dd/MM/yyyy", new Date()),
-          "dd/MM/yyyy"
-        );
-      } catch (err) {
-        dueDate = null;
-        alert("Please input a valid date");
-      }
-      console.log(dueDate);
-    } while (dueDate == null);
-    const priority = prompt("Input the task's priority (Low/Medium/High) : ");
-    this.tasks.push(new Task(title, description, dueDate, priority));
-    alert("Task has been added!");
+  addTask(title, description, dueDate, priority, isComplete) {
+    this.tasks.push(
+      new Task(
+        title,
+        description,
+        dueDate,
+        priority,
+        this.projectName,
+        isComplete
+      )
+    );
+    this.updateID();
   }
 
   getTasks() {
     return this.tasks;
   }
 
-  openCertainTask(task) {
-    console.log(task);
-    if (task != null) {
-      return task.showDetail(); // Ga kerecognize sebagai function
-    }
-    return null;
-  }
-
   deleteCertainTask(taskIndex) {
     this.tasks.splice(taskIndex, 1);
+    this.updateID();
     return this.tasks;
   }
 
@@ -135,9 +196,15 @@ class TaskManager {
     return weekTask;
   }
 
-  markUpdate(taskIndex, numberOfDay) {
+  markUpdate(taskIndex) {
     this.tasks[taskIndex].isComplete = !this.tasks[taskIndex].isComplete;
-    menuX.chooseTask(numberOfDay, false, true);
+  }
+
+  updateID() {
+    // for (let i = 0; i < this.tasks.length; i++) {
+    //   this.tasks[i].uid = i;
+    // }
+    Store.saveProjects();
   }
 }
 
@@ -156,6 +223,7 @@ class ProjectManager {
   addProject(name) {
     let project = new Project(name);
     this.projects.push(project);
+    this.updateID();
   }
 
   getAllProjects() {
@@ -176,222 +244,32 @@ class ProjectManager {
 
   deleteCertainProject(projectIndex) {
     this.projects.splice(projectIndex, 1);
-  }
-}
-
-class Menu {
-  constructor() {
-    this.options = "";
-    this.projectIndex = "";
-    this.taskManager;
-    this.taskIndex = "";
-    this.tasks = [];
+    this.updateID();
   }
 
-  showProjects() {
-    this.options = "";
-    for (var [i, project] of projectManager.getAllProjects().entries()) {
-      this.options += `${i + 1}. ${project.name}\n`;
-    }
-    if (this.options == "") {
-      this.options += "No project is available\n";
-    }
-    this.options +=
-      "Input the number. If you want to create a new project, input 0\n";
-    this.options += "To quit the app input x";
-    this.projectIndex = prompt(this.options);
-    this.chooseProject();
-
-    DOM.loadProjects(projectManager.getAllProjects());
-  }
-
-  chooseProject() {
-    console.log(this.projectIndex);
-    if (
-      this.projectIndex != 0 &&
-      Number.isInteger(parseInt(this.projectIndex))
-    ) {
-      this.projectIndex -= 1;
-      //If project Indexnya angka valid
-      this.taskManager = projectManager.openCertainProject(this.projectIndex); //Cek
-      if (this.taskManager == null) {
-        // Kalau null berarti kosong, balik ke showProjects lagi
-        alert("The input is not valid");
-        this.showProjects();
-      }
-      this.showDates(); // Kalau ada lgsg buka list dates yg mau dipilih
-    } else if (Number.isInteger(parseInt(this.projectIndex))) {
-      this.projectIndex -= 1;
-      //Angka 0
-      DOM.newProject();
-      projectManager.addProject(prompt("Input your project name")); //Bikin project baru
-      this.taskManager = projectManager.openCertainProject(
-        projectManager.getAllProjects().length - 1
-      );
-      this.showProjects();
-    } else if (this.projectIndex == "x") {
-      //X berarti nutup app
-      return null;
-    } else {
-      //Unknown input
-      alert("What did you input?");
-      this.showProjects();
-    }
-    // this.showTasks(taskManager);
-  }
-
-  showTasks(numberOfDay) {
-    var empty = false;
-    var i = 1;
-    this.options = "";
-    this.options += "List of your tasks: \n";
-    for (var task of this.tasks) {
-      this.options += `${i}. ${task.title}\n`;
-      i++;
-    }
-    if (this.options == "List of your tasks: \n") {
-      this.options += `There's no available tasks\n`;
-      empty = true;
-    }
-    this.options +=
-      "Write down the number. If you want to create a new task, insert 0\nTo select other project, input x";
-    this.taskIndex = prompt(this.options);
-    this.chooseTask(numberOfDay, empty);
-  }
-
-  chooseTask(numberOfDay, empty, afterEdit) {
-    if (afterEdit) {
-      this.taskIndex += 1;
-    }
-    console.log("test 1");
-    var task;
-    if (this.taskIndex == "x") {
-      this.showDates();
-    } else if (
-      this.taskIndex != 0 &&
-      Number.isInteger(parseInt(this.taskIndex))
-    ) {
-      console.log("test 2");
-      this.taskIndex -= 1;
-      if (empty) {
-        alert("Input value is not valid");
-        this.showTasks(numberOfDay);
-      } else {
-        task = this.taskManager.openCertainTask(this.tasks[this.taskIndex]); // Make this based on date ?
-        if (task == null) {
-          alert("Invalid input");
-          this.showTasks(numberOfDay);
-        } else {
-          task +=
-            "What do you want to do with this task?\n1 to update complete\n2 to edit task\n3 to delete task\nx to go back to task list";
-          const answer = prompt(task);
-          switch (answer) {
-            case "1":
-              alert("Task is marked as complete");
-              this.taskManager.markUpdate(this.taskIndex, numberOfDay);
-              break;
-            case "2":
-              this.taskManager.editCertainTask(
-                this.tasks[this.taskIndex],
-                this.taskManager,
-                numberOfDay,
-                this.taskIndex
-              );
-              break;
-            case "3":
-              alert("Task is deleted");
-              this.tasks = this.taskManager.deleteCertainTask(this.taskIndex);
-              this.showTasks(numberOfDay);
-              break;
-            case "x":
-              this.showTasks(numberOfDay);
-              break;
-            default:
-              alert("Input invalid.");
-              this.chooseTask(this.taskIndex);
-          }
-        }
-      }
-      // this.showTasks(taskManager);
-    } else if (Number.isInteger(parseInt(this.taskIndex))) {
-      console.log("test 3");
-      this.taskIndex -= 1;
-      this.taskManager.addTask(); //Habis ngedit malah masuk ke new task ???
-      switch (numberOfDay) {
-        case 1:
-          this.tasks = this.taskManager.getTodayTask();
-          this.showTasks(1);
-          break;
-        case 2:
-          this.tasks = this.taskManager.getTomorrowTask();
-          this.showTasks(2);
-          break;
-        case 3:
-          this.tasks = this.taskManager.getWeekTask();
-          this.showTasks(3);
-          break;
-        case 4:
-          this.tasks = this.taskManager.getTasks();
-          this.showTasks(4);
-          break;
-      }
-    } else {
-      alert("What did you input?");
-      this.showTasks(numberOfDay);
-    }
-  }
-
-  showDates() {
-    var options = "";
-    options += "Please select dates to see\n";
-    options += "1. Today\n2. Tomorrow\n3. This week\n4. All\n";
-    options += "Write down the number.\nTo select other project, input x";
-    this.chooseDate(prompt(options));
-  }
-
-  chooseDate(date) {
-    if (date == 1) {
-      //Today
-      this.tasks = this.taskManager.getTodayTask();
-      this.showTasks(1);
-    } else if (date == 2) {
-      //Tomorrow
-      this.tasks = this.taskManager.getTomorrowTask();
-      this.showTasks(2);
-    } else if (date == 3) {
-      this.tasks = this.taskManager.getWeekTask();
-      this.showTasks(3);
-    } else if (date == 4) {
-      this.tasks = this.taskManager.getTasks();
-      this.showTasks(4);
-    } else if (date == "x") {
-      this.showProjects();
-    } else {
-      alert("Input is invalid.");
-      this.showDates();
-    }
-  }
-
-  manageTask(task) {
-    alert(task);
+  updateID() {
+    // for (let i = 0; i < this.projects.length; i++) {
+    //   this.projects[i].uid = i;
+    // }
+    Store.saveProjects();
   }
 }
 
 class DOMRelated {
   constructor() {
-    this.body = document.querySelector("body");
-    this.projects = document.getElementById("projects");
+    this.projects = document.getElementById("projects"); //Cuma kepakai di load projects
     this.main = document.querySelector(".main");
-    this.updateProjectModal = document.getElementById("updateProject-modal");
-    this.updateTaskModal = document.getElementById("updateTask-modal");
     this.addProjectModal = document.getElementById("addProject-modal");
     this.addTaskModal = document.getElementById("addTask-modal");
+    this.updateProjectModal = document.getElementById("updateProject-modal");
+    this.updateTaskModal = document.getElementById("updateTask-modal");
     this.confirmDeleteProjectModal = document.getElementById(
       "confirmDeleteProject-modal"
     );
     this.confirmDeleteTaskModal = document.getElementById(
       "confirmDeleteTask-modal"
     );
+    this.infoTaskModal = document.getElementById("infoTask-modal");
     this.taskModal = document.querySelector(".main.project");
     this.taskHeader = document.querySelector(".header");
     this.tasks = document.getElementById("tasks");
@@ -414,7 +292,6 @@ class DOMRelated {
   }
 
   assignButtons() {
-    menuX.projectIndex = 0;
     const button = document.getElementsByClassName("button");
     for (let element of button) {
       if (element.classList.contains("cancel")) {
@@ -432,22 +309,20 @@ class DOMRelated {
             this.toggleNewTaskModal(false);
             this.toggleConfirmDeleteTaskModal(false);
             this.toggleUpdateTaskModal(false);
+            this.toggleInfoTaskModal(false);
             document.getElementById("formAddTask").reset();
           });
         }
       } else if (element.classList.contains("taskday")) {
         element.addEventListener("click", () => {
-          console.log(element);
           this.dayLoad(element.id);
         });
       } else if (element.classList.contains("add")) {
         if (element.classList.contains("project")) {
-          console.log("test 2");
           element.addEventListener("click", () => {
             this.toggleNewProjectModal(true);
           });
         } else if (element.classList.contains("task")) {
-          console.log("test 3");
           element.addEventListener("click", () => {
             this.toggleNewTaskModal(true);
           });
@@ -603,21 +478,15 @@ class DOMRelated {
     const dueDate = document.querySelector("input#dueDate");
     const priority = document.querySelector("select#priority");
 
-    console.log(dueDate.value);
-
-    this.taskManager.tasks.push(
-      new Task(
-        taskTitle.value,
-        description.value,
-        dueDate.value,
-        priority.value
-      )
+    this.taskManager.addTask(
+      taskTitle.value,
+      description.value,
+      dueDate.value,
+      priority.value,
+      false
     );
 
-    console.log(this.taskManager);
-    console.log(this.currentTaskOpen);
     this.loadTask(this.currentTaskOpen);
-    console.log(this.i);
   }
 
   loadProjectName() {
@@ -633,10 +502,9 @@ class DOMRelated {
     const dueDate = document.getElementById("dueDateU");
     const priority = document.getElementById("priorityU");
 
-    console.log(format(this.taskManager.tasks[this.j].dueDate, "yyyy-MM-dd"));
     taskTitle.value = this.taskManager.tasks[this.j].title;
     description.value = this.taskManager.tasks[this.j].description;
-    dueDate.value = this.taskManager.tasks[this.j].dueDate; //Figure biar String bs masuk ke date gmn
+    dueDate.value = this.taskManager.tasks[this.j].dueDate;
     priority.value = this.taskManager.tasks[this.j].priority;
   }
 
@@ -736,7 +604,6 @@ class DOMRelated {
           containerMain.classList.add("active");
           this.currentTaskOpen = "alltask";
           this.loadTask(this.currentTaskOpen);
-          console.log(projects);
           this.openTaskModal(projects[this.i]);
           this.dayLoad(this.currentTaskOpen);
         });
@@ -822,7 +689,6 @@ class DOMRelated {
       empty.classList.add("empty");
       this.tasks.appendChild(empty);
 
-      console.log("I'm empty");
       switch (day) {
         case "alltask":
           this.day.textContent = "- All Tasks";
@@ -859,48 +725,152 @@ class DOMRelated {
           break;
       }
       for (let j = 0; j < tasks.length; j++) {
-        const taskContainer = document.createElement("div");
-        taskContainer.classList.add("task");
-        var priority = document.createElement("p");
+        const taskContainerX = document.createElement("div");
+        const taskContainerY = document.createElement("div");
+        const checkBox = document.createElement("input");
+
+        checkBox.setAttribute("type", "checkbox");
+
+        taskContainerX.classList.add("task");
         var taskName = document.createElement("p");
         var dueDate = document.createElement("p");
         var editDelete = document.createElement("div");
         var editIcon = document.createElement("i");
         var deleteIcon = document.createElement("i");
 
-        priority.textContent = tasks[j].priority;
         taskName.textContent = tasks[j].title;
         dueDate.textContent = format(tasks[j].dueDate, "dd-MM-yyyy");
 
-        priority.classList.add("priority");
         taskName.classList.add("taskName");
         dueDate.classList.add("taskDueDate");
 
         editIcon.classList.add("material-icons");
         editIcon.style.marginRight = "12px";
         deleteIcon.classList.add("material-icons");
+        deleteIcon.style.marginRight = "12px";
 
         editIcon.textContent = "edit";
         deleteIcon.textContent = "delete";
 
-        editIcon.addEventListener("click", () => {
+        const toggleUpdate = () => {
           this.j = j;
           this.toggleUpdateTaskModal(true);
-        });
+        };
 
-        deleteIcon.addEventListener("click", () => {
+        const toggleConfirm = () => {
+          this.j = j;
           this.toggleConfirmDeleteTaskModal(true);
-        });
+        };
+
+        editIcon.addEventListener("click", toggleUpdate);
+
+        deleteIcon.addEventListener("click", toggleConfirm);
 
         editDelete.appendChild(editIcon);
         editDelete.appendChild(deleteIcon);
 
-        taskContainer.appendChild(priority);
-        taskContainer.appendChild(taskName);
-        taskContainer.appendChild(dueDate);
-        taskContainer.appendChild(editDelete);
-        this.tasks.appendChild(taskContainer);
+        editDelete.classList.add("editDelete");
+
+        // taskContainerX.appendChild(priority);
+        taskContainerX.appendChild(taskName);
+        taskContainerX.appendChild(dueDate);
+
+        taskContainerX.addEventListener("click", () => {
+          this.j = j;
+          this.toggleInfoTaskModal(true);
+        });
+
+        taskContainerY.appendChild(checkBox);
+        taskContainerY.appendChild(taskContainerX);
+        taskContainerY.appendChild(editDelete);
+
+        taskContainerY.style.margin = "0px 8px 8px 8px";
+
+        if (tasks[j].isComplete) {
+          taskContainerY.children[0].click();
+          taskContainerY.children[1].children[0].style.textDecoration =
+            "line-through";
+          taskContainerY.children[1].children[1].style.color = "grey";
+          taskContainerY.children[2].children[0].style.color = "grey";
+          taskContainerY.children[2].children[1].style.color = "grey";
+
+          taskContainerY.children[2].children[0].removeEventListener(
+            "click",
+            toggleUpdate
+          );
+          taskContainerY.children[2].children[1].removeEventListener(
+            "click",
+            toggleConfirm
+          );
+        }
+
+        checkBox.addEventListener("change", function () {
+          if (checkBox.checked) {
+            taskContainerY.children[1].children[0].style.textDecoration =
+              "line-through";
+            taskContainerY.children[1].children[1].style.color = "grey";
+            taskContainerY.children[2].children[0].style.color = "grey";
+            taskContainerY.children[2].children[1].style.color = "grey";
+
+            taskContainerY.children[2].children[0].removeEventListener(
+              "click",
+              toggleUpdate
+            );
+            taskContainerY.children[2].children[1].removeEventListener(
+              "click",
+              toggleConfirm
+            );
+
+            tasks[j].isComplete = true;
+            Store.saveProjects();
+          } else {
+            taskContainerY.children[1].children[0].style.textDecoration =
+              "none";
+            taskContainerY.children[1].children[1].style.color = "white";
+            taskContainerY.children[2].children[0].style.color = "white";
+            taskContainerY.children[2].children[1].style.color = "white";
+
+            taskContainerY.children[2].children[0].addEventListener(
+              "click",
+              toggleUpdate
+            );
+            taskContainerY.children[2].children[1].addEventListener(
+              "click",
+              toggleConfirm
+            );
+            Store.saveProjects();
+          }
+        });
+
+        taskContainerY.classList.add("detail");
+        if (tasks[j].priority == "Low") {
+          taskContainerY.style.backgroundColor = "rgb(79, 109, 79)";
+        } else if (tasks[j].priority == "High") {
+          taskContainerY.style.backgroundColor = "rgb(109, 79, 79)";
+        } else if (tasks[j].priority == "Medium") {
+          taskContainerY.style.backgroundColor = "rgb(109, 109, 79)";
+        }
+
+        this.tasks.appendChild(taskContainerY);
       }
+    }
+  }
+
+  toggleInfoTaskModal(visibility) {
+    if (visibility) {
+      const taskTitle = document.getElementById("taskTitleI");
+      const description = document.getElementById("descriptionI");
+      const dueDate = document.getElementById("dueDateI");
+      const priority = document.getElementById("priorityI");
+
+      taskTitle.value = this.taskManager.tasks[this.j].title;
+      description.value = this.taskManager.tasks[this.j].description;
+      dueDate.value = this.taskManager.tasks[this.j].dueDate;
+      priority.value = this.taskManager.tasks[this.j].priority;
+
+      this.infoTaskModal.style.display = "block";
+    } else {
+      this.infoTaskModal.style.display = "none";
     }
   }
 
@@ -913,14 +883,52 @@ class DOMRelated {
 }
 
 var projectManager = new ProjectManager();
-projectManager.addProject("Senin");
-projectManager.addProject("Selasa");
-projectManager.addProject("Rabu");
-projectManager.addProject("Kamis");
-projectManager.addProject("Jumat");
-projectManager.addProject("Sabtu");
-projectManager.addProject("Minggu");
+// Store.checkStorage();
 
-const menuX = new Menu();
+// projectManager.addProject("Senin");
+// projectManager.addProject("Selasa");
+// projectManager.addProject("Rabu");
+// projectManager.addProject("Kamis");
+// projectManager.addProject("Jumat");
+// projectManager.addProject("Sabtu");
+// projectManager.addProject("Minggu");
+
 const DOM = new DOMRelated();
-// menuX.welcome();
+// projectManager.projects[6].taskManager.addTask("a", "a", "2024-08-08", "Low");
+// projectManager.projects[6].taskManager.addTask(
+//   "b",
+//   "b",
+//   "2024-08-08",
+//   "Medium"
+// );
+// projectManager.projects[0].taskManager.addTask("c", "c", "2024-08-08", "High");
+
+Store.checkStorage();
+//GIMANA BIAR GA ADA TITLE YANG SAMA EXIST IN THE SAME TIME? APAKAH HARUS PAKAI ID ? OR INDEX YA?
+// projectManager.projects[6].taskManager.addTask("d", "d", "2024-08-08", "Low");
+// projectManager.projects[6].taskManager.addTask("a", "a", "2024-08-08", "Low");
+// projectManager.projects[6].taskManager.addTask(
+//   "a",
+//   "a",
+//   "2024-08-08",
+//   "Medium"
+// );
+// projectManager.projects[6].taskManager.addTask("a", "a", "2024-08-08", "Low");
+// projectManager.projects[6].taskManager.addTask(
+//   "a",
+//   "a",
+//   "2024-08-08",
+//   "Medium"
+// );
+// projectManager.projects[6].taskManager.addTask(
+//   "a",
+//   "a",
+//   "2024-08-08",
+//   "Medium"
+// );
+// projectManager.projects[6].taskManager.addTask("a", "a", "2024-08-08", "Low");
+// projectManager.projects[6].taskManager.addTask("a", "a", "2024-08-08", "Low");
+// projectManager.projects[6].taskManager.addTask("a", "a", "2024-08-08", "High");
+// projectManager.projects[6].taskManager.addTask("a", "a", "2024-08-08", "Low");
+// projectManager.projects[6].taskManager.addTask("a", "a", "2024-08-08", "High");
+// projectManager.projects[6].taskManager.addTask("a", "a", "2024-08-08", "High");

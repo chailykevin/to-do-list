@@ -126,6 +126,13 @@ body .main button {
   border-radius: 10px;
 }
 
+body .main.project #tasks {
+  overflow: auto;
+  overflow-x: hidden;
+  position: relative;
+  padding-top: 8px;
+}
+
 body .main.project #tasks div i {
   padding: 2px;
 }
@@ -187,9 +194,8 @@ body .main.project #tasks {
   border-bottom: 1px solid white;
   height: 100%;
   .task {
-    padding: 4px 0px;
     display: grid;
-    grid-template-columns: 1fr 4fr 1fr auto;
+    grid-template-columns: 4fr 1fr;
     gap: 8px;
     .priority {
       justify-self: center;
@@ -220,7 +226,8 @@ body #addProject-modal,
 #updateProject-modal,
 #updateTask-modal,
 #confirmDeleteProject-modal,
-#confirmDeleteTask-modal {
+#confirmDeleteTask-modal,
+#infoTask-modal {
   position: fixed;
   width: 100vw;
   height: 100vh;
@@ -264,4 +271,30 @@ body .wholeModal .buttons {
 
 .active {
   background-color: rgb(75, 75, 75);
+}
+
+.detail {
+  overflow: hidden;
+  transition: transform 330ms;
+  display: grid;
+  grid-template-columns: min-content auto min-content;
+  padding: 4px 16px;
+  gap: 12px;
+}
+
+.detail:hover {
+  background-color: rgb(40, 40, 40);
+  transform: scale(1.01);
+  cursor: pointer;
+  /* box-shadow: 3px 3px 5px 2px rgba(0, 0, 0, 0.2); */
+  /* padding: 0px; */
+  /* background-color: rgb(107, 109, 79); */
+}
+
+.detail input:hover {
+  cursor: pointer;
+}
+
+.editDelete {
+  width: 80px;
 }

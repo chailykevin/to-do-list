@@ -179,5 +179,29 @@
         </div>
       </form>
     </div>
+    <div id="infoTask-modal">
+      <form class="wholeModal" id="formInfoTask">
+        <label for="taskTitleI">Title : </label>
+        <input type="text" id="taskTitleI" disabled />
+        <label for="descriptionI">Description : </label>
+        <textarea
+          name="description"
+          id="descriptionI"
+          rows="5"
+          disabled
+        ></textarea>
+        <label for="dueDateI">dueDate : </label>
+        <input type="date" id="dueDateI" disabled />
+        <label for="priorityI">Priority : </label>
+        <select name="priority" id="priorityI" disabled>
+          <option value="Low">Low</option>
+          <option value="Medium">Medium</option>
+          <option value="High">High</option>
+        </select>
+        <div class="buttons">
+          <button class="cancel button task">Close</button>
+        </div>
+      </form>
+    </div>
   </body>
 </html>
