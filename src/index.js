@@ -282,6 +282,16 @@ class DOMRelated {
     this.assignButtons();
     this.loadProjects(projectManager.projects);
     this.setDateInput();
+    this.assignHamburger();
+  }
+
+  assignHamburger() {
+    let hamburger = document.querySelector("#menu-btn");
+    hamburger.addEventListener("click", () => {
+      let sidebar = document.querySelector("div.sidebar");
+      sidebar.classList.toggle("active");
+      // sidebar.addEventListener("")
+    });
   }
 
   setDateInput() {
@@ -451,6 +461,8 @@ class DOMRelated {
   }
 
   toggleNewProjectModal(visibility) {
+    let sidebar = document.querySelector("div.sidebar");
+    sidebar.classList.toggle("active");
     if (visibility) {
       this.addProjectModal.style.display = "block";
     } else {
@@ -582,6 +594,8 @@ class DOMRelated {
         deleteIcon.style.visibility = "hidden";
         deleteIcon.style.paddingRight = "4px";
 
+        deleteIcon.classList.add("deleteIcon");
+
         containerX.style.display = "flex";
         containerX.style.alignItems = "center";
         containerX.style.gap = "8px";
@@ -595,10 +609,14 @@ class DOMRelated {
 
         deleteIcon.addEventListener("click", () => {
           this.i = i;
+          let sidebar = document.querySelector("div.sidebar");
+          sidebar.classList.toggle("active");
           this.toggleConfirmDeleteProjectModal(true);
         });
 
         containerX.addEventListener("click", () => {
+          let sidebar = document.querySelector("div.sidebar");
+          sidebar.classList.toggle("active");
           this.i = i;
           this.removeActive();
           containerMain.classList.add("active");
@@ -883,52 +901,5 @@ class DOMRelated {
 }
 
 var projectManager = new ProjectManager();
-// Store.checkStorage();
-
-// projectManager.addProject("Senin");
-// projectManager.addProject("Selasa");
-// projectManager.addProject("Rabu");
-// projectManager.addProject("Kamis");
-// projectManager.addProject("Jumat");
-// projectManager.addProject("Sabtu");
-// projectManager.addProject("Minggu");
-
 const DOM = new DOMRelated();
-// projectManager.projects[6].taskManager.addTask("a", "a", "2024-08-08", "Low");
-// projectManager.projects[6].taskManager.addTask(
-//   "b",
-//   "b",
-//   "2024-08-08",
-//   "Medium"
-// );
-// projectManager.projects[0].taskManager.addTask("c", "c", "2024-08-08", "High");
-
 Store.checkStorage();
-//GIMANA BIAR GA ADA TITLE YANG SAMA EXIST IN THE SAME TIME? APAKAH HARUS PAKAI ID ? OR INDEX YA?
-// projectManager.projects[6].taskManager.addTask("d", "d", "2024-08-08", "Low");
-// projectManager.projects[6].taskManager.addTask("a", "a", "2024-08-08", "Low");
-// projectManager.projects[6].taskManager.addTask(
-//   "a",
-//   "a",
-//   "2024-08-08",
-//   "Medium"
-// );
-// projectManager.projects[6].taskManager.addTask("a", "a", "2024-08-08", "Low");
-// projectManager.projects[6].taskManager.addTask(
-//   "a",
-//   "a",
-//   "2024-08-08",
-//   "Medium"
-// );
-// projectManager.projects[6].taskManager.addTask(
-//   "a",
-//   "a",
-//   "2024-08-08",
-//   "Medium"
-// );
-// projectManager.projects[6].taskManager.addTask("a", "a", "2024-08-08", "Low");
-// projectManager.projects[6].taskManager.addTask("a", "a", "2024-08-08", "Low");
-// projectManager.projects[6].taskManager.addTask("a", "a", "2024-08-08", "High");
-// projectManager.projects[6].taskManager.addTask("a", "a", "2024-08-08", "Low");
-// projectManager.projects[6].taskManager.addTask("a", "a", "2024-08-08", "High");
-// projectManager.projects[6].taskManager.addTask("a", "a", "2024-08-08", "High");

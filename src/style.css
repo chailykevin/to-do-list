@@ -7,6 +7,10 @@
   color: white;
 }
 
+html {
+  font-size: 16px;
+}
+
 ::-webkit-scrollbar {
   width: 10px;
 }
@@ -29,8 +33,7 @@ body {
 
 body .sidebar {
   background-color: rgb(35, 35, 35);
-  flex: 0;
-  min-width: 20vw;
+  max-width: 300px;
   padding: 20px;
   display: flex;
   flex-direction: column;
@@ -40,7 +43,9 @@ body .sidebar {
 }
 
 body .sidebar .title {
-  text-align: center;
+  padding-inline: 30px;
+  /* text-align: center; */
+  align-self: center;
 }
 
 body .sidebar h2 {
@@ -101,7 +106,8 @@ body .sidebar #projects .scrollable h3 {
   text-overflow: ellipsis;
 }
 body .main {
-  flex: 1;
+  width: calc(100% - 200px);
+  /* flex: 1; */
   background-color: rgb(62, 62, 62);
   display: flex;
   flex-direction: column;
@@ -271,6 +277,9 @@ body .wholeModal .buttons {
 
 .active {
   background-color: rgb(75, 75, 75);
+  i.deleteIcon {
+    visibility: visible !important;
+  }
 }
 
 .detail {
@@ -297,4 +306,56 @@ body .wholeModal .buttons {
 
 .editDelete {
   width: 80px;
+}
+
+@media screen and (max-width: 1050px) {
+  html {
+    font-size: 12px;
+  }
+}
+
+@media screen and (max-width: 750px) {
+  body .sidebar {
+    .title {
+      display: none;
+    }
+    position: absolute;
+    justify-self: center;
+    width: 100%;
+    top: 25px;
+    transition: 0.5s;
+    padding: 0px;
+    height: 0px;
+    opacity: 0;
+  }
+
+  body .sidebar.active {
+    height: 100%;
+    opacity: 1;
+    z-index: 10;
+    padding: 20px 20px 40px 20px;
+  }
+
+  body .main {
+    width: 100%;
+  }
+
+  body {
+    display: grid;
+    grid-template-rows: auto 1fr;
+    overflow: hidden;
+  }
+
+  #menu-btn {
+    background-color: rgb(35, 35, 35);
+    display: flex;
+    justify-content: space-between;
+    padding: 5px 15px;
+  }
+}
+
+@media screen and (max-width: 500px) {
+  html {
+    font-size: 10px;
+  }
 }
