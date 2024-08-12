@@ -461,8 +461,6 @@ class DOMRelated {
   }
 
   toggleNewProjectModal(visibility) {
-    let sidebar = document.querySelector("div.sidebar");
-    sidebar.classList.toggle("active");
     if (visibility) {
       this.addProjectModal.style.display = "block";
     } else {
