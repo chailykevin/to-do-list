@@ -18,28 +18,8 @@ class Storage {
     }
   }
 
-  // loadProjects()
-
   saveProjects() {
-    // localStorage.clear();
-    // for (let project of projectManager.projects) {
-    //   localStorage.setItem(`P${project.uid}`, JSON.stringify(project.name));
-    //   for (var task of project.taskManager.tasks) {
-    //     localStorage.setItem(
-    //       `P${project.uid}.T${task.uid}`,
-    //       JSON.stringify(task)
-    //     );
-    //   }
-    // }
-    // localStorage.setItem("tasks", projectManager.projects);
     localStorage.setItem("projectManager", JSON.stringify(projectManager));
-    // for (let project of projectManager.projects) {
-    //   // console.log(project.name);
-    //   localStorage.setItem(
-    //     `${project.name}.task`,
-    //     JSON.stringify(project.taskManager.tasks)
-    //   );
-    // }
   }
 
   getProjects() {
@@ -65,31 +45,6 @@ class Storage {
 
       DOM.loadProjects(projectManager.projects);
     }
-    //   let projects;
-    //   let tasks = [];
-    //   for (let i = 0; i < localStorage.length; i++) {
-    //     // var value = localStorage.getItem(localStorage.key(i));
-    //     // console.log(localStorage.key(i));
-    //     if (!localStorage.key(i).includes(".")) {
-    //       projects = JSON.parse(localStorage.getItem(localStorage.key(i)));
-    //     } else {
-    //       tasks.push(JSON.parse(localStorage.getItem(localStorage.key(i))));
-    //     }
-    //     // } else {
-    //     //   // console.log(JSON.parse(localStorage.getItem(localStorage.key(i))));
-    //     //   // projectManager.addProject(
-    //     //   //   JSON.parse(localStorage.getItem(localStorage.key(i)))
-    //     //   // );
-    //     // }
-    //   }
-    //   for (let task of tasks) {
-    //     console.log(task.projectName);
-    //   }
-    //   for (let project of projects) {
-    //     projectManager.addProject(project.name);
-    //   }
-    //   console.log(tasks);
-    //   // console.log(projectManager);
   }
 }
 
@@ -201,9 +156,6 @@ class TaskManager {
   }
 
   updateID() {
-    // for (let i = 0; i < this.tasks.length; i++) {
-    //   this.tasks[i].uid = i;
-    // }
     Store.saveProjects();
   }
 }
@@ -248,9 +200,6 @@ class ProjectManager {
   }
 
   updateID() {
-    // for (let i = 0; i < this.projects.length; i++) {
-    //   this.projects[i].uid = i;
-    // }
     Store.saveProjects();
   }
 }
@@ -280,7 +229,7 @@ class DOMRelated {
     this.projectSelected = false;
     this.day = document.getElementById("day");
     this.assignButtons();
-    this.loadProjects(projectManager.projects);
+    // this.loadProjects(projectManager.projects);
     this.setDateInput();
     this.assignHamburger();
   }
@@ -290,7 +239,6 @@ class DOMRelated {
     hamburger.addEventListener("click", () => {
       let sidebar = document.querySelector("div.sidebar");
       sidebar.classList.toggle("active");
-      // sidebar.addEventListener("")
     });
   }
 
@@ -563,11 +511,14 @@ class DOMRelated {
     container.appendChild(name);
 
     container.addEventListener("click", () => {
+      let sidebar = document.querySelector("div.sidebar");
+      sidebar.classList.remove("active");
       this.toggleNewProjectModal(true);
-      this.loadProjects;
     });
 
     this.projects.appendChild(container);
+
+    const button = document.querySelector("button.submit.project");
 
     if (projects != null) {
       for (let i = projects.length - 1; i >= 0; i--) {
@@ -623,6 +574,20 @@ class DOMRelated {
           this.openTaskModal(projects[this.i]);
           this.dayLoad(this.currentTaskOpen);
         });
+
+        if (i == projects.length - 1) {
+          button.addEventListener("click", () => {
+            let sidebar = document.querySelector("div.sidebar");
+            sidebar.classList.toggle("active");
+            this.i = i + 1;
+            this.removeActive();
+            containerMain.classList.add("active");
+            this.currentTaskOpen = "alltask";
+            this.loadTask(this.currentTaskOpen);
+            this.openTaskModal(projects[this.i]);
+            this.dayLoad(this.currentTaskOpen);
+          });
+        }
 
         scrollable.appendChild(containerMain);
         this.projects.appendChild(scrollable);
@@ -695,6 +660,7 @@ class DOMRelated {
 
   loadTask(day) {
     this.projectSelected = true;
+    console.log(this.i);
     this.taskManager = projectManager.openCertainProject(this.i);
     this.taskHeader;
     this.tasks.innerHTML = "";
