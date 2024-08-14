@@ -11,8 +11,6 @@ const {
 class Storage {
   checkStorage() {
     if (localStorage.length == 0) {
-      console.log(localStorage.getItem("P0"));
-      console.log("nun");
     } else {
       this.getProjects();
     }
@@ -28,10 +26,8 @@ class Storage {
       projectManager.addProject(projectManagers.projects[i].name);
       let currentProject = projectManager.projects[i];
       let taskList = projectManagers.projects[i].taskManager.tasks;
-      console.log(taskList);
 
       for (let task of taskList) {
-        console.log(task.isComplete);
         if (task.projectName == currentProject.name) {
           currentProject.taskManager.addTask(
             task.title,
@@ -107,7 +103,7 @@ class TaskManager {
   getTodayTask() {
     var todayTask = [];
     for (var task of this.tasks) {
-      if (task.dueDate == format(new Date(), "dd/MM/yyyy")) {
+      if (task.dueDate == format(new Date(), "yyyy-MM-dd")) {
         todayTask.push(task);
       }
     }
@@ -117,7 +113,7 @@ class TaskManager {
   getTomorrowTask() {
     var tomorrowTask = [];
     for (var task of this.tasks) {
-      if (task.dueDate == format(addDays(new Date(), 1), "dd/MM/yyyy")) {
+      if (task.dueDate == format(addDays(new Date(), 1), "yyyy-MM-dd")) {
         tomorrowTask.push(task);
       }
     }
@@ -133,11 +129,11 @@ class TaskManager {
     const endOfWeekDate = endOfWeek(now, { weekStartsOn: 0 });
 
     function parseDate(dateString) {
-      return parse(dateString, "dd/MM/yyyy", new Date());
+      return parse(dateString, "yyyy-MM-dd", new Date());
     }
 
     for (var task of this.tasks) {
-      const taskDate = parse(task.dueDate, "dd/MM/yyyy", new Date());
+      const taskDate = parse(task.dueDate, "yyyy-MM-dd", new Date());
       if (
         isWithinInterval(taskDate, {
           start: startOfWeekDate,
@@ -272,6 +268,7 @@ class DOMRelated {
           });
         }
       } else if (element.classList.contains("taskday")) {
+        console.log("ada");
         element.addEventListener("click", () => {
           this.dayLoad(element.id);
         });
@@ -601,6 +598,7 @@ class DOMRelated {
       const thisWeek = document.querySelector("div#thisweek");
       const tomorrow = document.querySelector("div#tomorrow");
       const today = document.querySelector("div#today");
+      console.log("dadsa");
 
       switch (i) {
         case "alltask":
@@ -660,7 +658,6 @@ class DOMRelated {
 
   loadTask(day) {
     this.projectSelected = true;
-    console.log(this.i);
     this.taskManager = projectManager.openCertainProject(this.i);
     this.taskHeader;
     this.tasks.innerHTML = "";
