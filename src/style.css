@@ -222,6 +222,11 @@ body .main.project #tasks {
   }
 }
 
+body .main.project div.withicon.add.button.task {
+  display: flex;
+  align-items: center;
+}
+
 body .main.project .withicon h3 {
   font-size: 0.9rem;
   padding-bottom: 0px;
@@ -316,6 +321,23 @@ body .wholeModal .buttons {
   html {
     font-size: 12px;
   }
+
+  body .main.project #tasks .task {
+    grid-template-columns: 7fr 3fr;
+  }
+
+  body .main.project #tasks .detail {
+    padding-right: 0px;
+  }
+
+  body .main.project .add.button {
+    padding: 3px 16px 3px 9px;
+  }
+
+  .material-icons,
+  body .main.project #tasks div i {
+    font-size: 20px;
+  }
 }
 
 @media screen and (max-width: 750px) {
@@ -358,12 +380,16 @@ body .wholeModal .buttons {
   }
 }
 
-@media screen and (max-width: 500px) {
+@media screen and (max-width: 550px) {
   html {
     font-size: 10px;
   }
 
   body .main h2 {
     text-align: center;
+  }
+
+  body .main.project #tasks .task {
+    grid-template-columns: 6fr 4fr;
   }
 }

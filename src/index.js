@@ -268,8 +268,10 @@ class DOMRelated {
           });
         }
       } else if (element.classList.contains("taskday")) {
-        console.log("ada");
+        console.log("test");
         element.addEventListener("click", () => {
+          let sidebar = document.querySelector("div.sidebar");
+          sidebar.classList.toggle("active");
           this.dayLoad(element.id);
         });
       } else if (element.classList.contains("add")) {
