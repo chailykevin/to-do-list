@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 import "./style.css";
 const {
   format,
@@ -11,6 +12,7 @@ const {
 class Storage {
   checkStorage() {
     if (localStorage.length == 0) {
+      /* empty */
     } else {
       this.getProjects();
     }
@@ -128,10 +130,6 @@ class TaskManager {
     const startOfWeekDate = startOfWeek(now, { weekStartsOn: 0 });
     const endOfWeekDate = endOfWeek(now, { weekStartsOn: 0 });
 
-    function parseDate(dateString) {
-      return parse(dateString, "yyyy-MM-dd", new Date());
-    }
-
     for (var task of this.tasks) {
       const taskDate = parse(task.dueDate, "yyyy-MM-dd", new Date());
       if (
@@ -228,6 +226,7 @@ class DOMRelated {
     // this.loadProjects(projectManager.projects);
     this.setDateInput();
     this.assignHamburger();
+    this.reload = false;
   }
 
   assignHamburger() {
@@ -240,7 +239,7 @@ class DOMRelated {
 
   setDateInput() {
     var today = new Date().toISOString().split("T")[0];
-    var dates = document.querySelectorAll("input.date").forEach((date) => {
+    document.querySelectorAll("input.date").forEach((date) => {
       date.setAttribute("min", today);
     });
   }
@@ -358,9 +357,14 @@ class DOMRelated {
       } else if (element.classList.contains("delete")) {
         if (element.classList.contains("project")) {
           element.addEventListener("click", () => {
-            this.deleteProject(this.i);
-            this.loadProjects(projectManager.projects);
-            this.toggleConfirmDeleteProjectModal(false);
+            if (this.reload) {
+              this.deleteProject(this.i);
+              location.reload();
+            } else {
+              this.deleteProject(this.i);
+              this.loadProjects(projectManager.projects);
+              this.toggleConfirmDeleteProjectModal(false);
+            }
           });
         } else if (element.classList.contains("task")) {
           element.addEventListener("click", () => {
@@ -538,10 +542,6 @@ class DOMRelated {
         name.textContent = projects[i].name;
         deleteIcon.textContent = "delete";
 
-        deleteIcon.style.alignSelf = "last baseline";
-        deleteIcon.style.visibility = "hidden";
-        deleteIcon.style.paddingRight = "4px";
-
         deleteIcon.classList.add("deleteIcon");
 
         containerX.style.display = "flex";
@@ -559,7 +559,13 @@ class DOMRelated {
           this.i = i;
           let sidebar = document.querySelector("div.sidebar");
           sidebar.classList.toggle("active");
-          this.toggleConfirmDeleteProjectModal(true);
+
+          if (containerMain.classList.contains("active")) {
+            this.reload = true;
+            this.toggleConfirmDeleteProjectModal(true, true);
+          } else {
+            this.toggleConfirmDeleteProjectModal(true, false);
+          }
         });
 
         containerX.addEventListener("click", () => {
@@ -567,6 +573,8 @@ class DOMRelated {
           sidebar.classList.toggle("active");
           this.i = i;
           this.removeActive();
+
+          deleteIcon.classList.add("active");
           containerMain.classList.add("active");
           this.currentTaskOpen = "alltask";
           this.loadTask(this.currentTaskOpen);
@@ -653,8 +661,10 @@ class DOMRelated {
 
   removeActive() {
     const container = document.querySelector(".project.active");
+    const deleteIcon = document.querySelector(".deleteIcon.active");
     if (container != null) {
       container.classList.remove("active");
+      deleteIcon.classList.remove("active");
     }
   }
 

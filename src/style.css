@@ -286,9 +286,17 @@ body .wholeModal .buttons {
 
 .active {
   background-color: rgb(75, 75, 75);
-  i.deleteIcon {
-    visibility: visible !important;
-  }
+}
+
+i.deleteIcon {
+  visibility: hidden;
+  align-self: last baseline;
+  visibility: hidden;
+  margin-right: 4px;
+}
+
+i.deleteIcon.active {
+  visibility: visible;
 }
 
 .detail {
